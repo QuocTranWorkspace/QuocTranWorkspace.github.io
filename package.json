@@ -1,0 +1,37 @@
+{
+  "name": "byquoc-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Quoc Tran Trung — cinematic portfolio. Next.js 16 App Router, Tailwind v4, GSAP+ScrollTrigger, Lenis, Framer Motion.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.23",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.14.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^6.0.3",
+    "tailwindcss": "^4.3.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "postcss": "^8.5.0"
+  },
+  "engines": {
+    "node": ">=20.10"
+  }
+}
