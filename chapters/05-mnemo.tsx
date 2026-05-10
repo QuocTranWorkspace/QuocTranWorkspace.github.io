@@ -9,6 +9,8 @@ const scoreTerms = [
   { key: "lexical", weight: 0.2, label: "Lexical overlap" },
 ];
 
+const maxWeight = Math.max(...scoreTerms.map((t) => t.weight));
+
 const stats = [
   { value: "100%", label: "top-1 accuracy" },
   { value: "1.000", label: "MRR" },
@@ -48,33 +50,42 @@ export function Mnemo() {
           </p>
         </header>
 
-        <div className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
-          <div className="rounded-2xl border rule bg-bg-elev/60 p-8">
+        <div className="grid gap-4 md:gap-8 md:grid-cols-[1.2fr_1fr] md:items-stretch">
+          <div className="flex flex-col rounded-2xl border rule bg-bg-elev/60 p-6 sm:p-8">
             <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-mute mb-6">
               Scoring breakdown
             </p>
-            <ul className="space-y-3">
+            <ul className="flex flex-1 flex-col justify-between gap-3">
               {scoreTerms.map((t) => (
-                <li key={t.key} className="flex items-center gap-4">
-                  <span className="stat text-xs w-20 shrink-0">{t.weight.toFixed(2)}</span>
-                  <span className="flex-1 font-mono text-sm text-ink">{t.label}</span>
+                <li
+                  key={t.key}
+                  className="grid grid-cols-[2.5rem_minmax(0,1fr)_3rem] items-center gap-3 sm:grid-cols-[3rem_minmax(0,1fr)_5rem] sm:gap-4 lg:grid-cols-[3rem_minmax(0,1fr)_7rem]"
+                >
+                  <span className="stat text-xs">{t.weight.toFixed(2)}</span>
+                  <span className="font-mono text-xs sm:text-sm text-ink">
+                    {t.label}
+                  </span>
                   <span
                     aria-hidden
-                    className="h-1 rounded-full bg-accent-warm/60"
-                    style={{ width: `${t.weight * 200}px` }}
-                  />
+                    className="h-1 w-full overflow-hidden rounded-full bg-rule"
+                  >
+                    <span
+                      className="block h-full rounded-full bg-accent-warm/70"
+                      style={{ width: `${(t.weight / maxWeight) * 100}%` }}
+                    />
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <ul className="grid grid-cols-2 gap-4 self-start">
+          <ul className="grid h-full grid-cols-2 grid-rows-2 gap-4">
             {stats.map((s) => (
               <li
                 key={s.label}
-                className="rounded-2xl border rule bg-bg-elev/60 p-6"
+                className="flex flex-col justify-center rounded-2xl border rule bg-bg-elev/60 p-5 sm:p-6"
               >
-                <p className="stat text-3xl text-accent-warm">{s.value}</p>
+                <p className="stat text-2xl sm:text-3xl text-accent-warm">{s.value}</p>
                 <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
                   {s.label}
                 </p>
