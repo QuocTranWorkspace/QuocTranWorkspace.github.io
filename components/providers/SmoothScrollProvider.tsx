@@ -14,16 +14,20 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     const gsap = ensureGsap();
     const lenis = bootLenis();
 
+    let tickerCb: ((time: number) => void) | null = null;
     if (lenis) {
       // Bridge Lenis -> ScrollTrigger so pinned timelines stay in lockstep.
       lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add((time) => {
+      // Single RAF driver: GSAP's ticker. lenis.raf wants milliseconds.
+      tickerCb = (time: number) => {
         getLenis()?.raf(time * 1000);
-      });
+      };
+      gsap.ticker.add(tickerCb);
       gsap.ticker.lagSmoothing(0);
     }
 
     return () => {
+      if (tickerCb) gsap.ticker.remove(tickerCb);
       ScrollTrigger.getAll().forEach((t) => t.kill());
       destroyLenis();
     };

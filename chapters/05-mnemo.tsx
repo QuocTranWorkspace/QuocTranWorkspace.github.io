@@ -16,7 +16,13 @@ const stats = [
   { value: "≤ 800", label: "tokens injected per prompt" },
 ];
 
-const roadmap = ["v1.0 — shipped", "v1.1 — base/scope split", "v2 — cross-machine sync", "v3 — chat surface", "v4 — multi-agent"];
+const roadmap = [
+  "v1.1 — shipped",
+  "v1.2 — learning to listen",
+  "v2 — code graph",
+  "v3 — chat surface",
+  "v4 — refinement",
+];
 
 export function Mnemo() {
   return (
@@ -28,15 +34,17 @@ export function Mnemo() {
       <div className="container-edge">
         <header className="mb-14 max-w-3xl space-y-3">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent-warm">
-            Chapter 05 · mnemo · passion project, shipped
+            Chapter 05 · mnemo · v1.1.0 published
           </p>
           <h2 className="font-display text-5xl md:text-7xl text-balance">
             <span className="italic text-accent-warm">A memory layer</span> that makes
-            Claude Code remember what you've already taught it.
+            Claude Code remember what you&rsquo;ve already taught it.
           </h2>
           <p className="text-ink-mute text-lg max-w-2xl text-balance">
             Local-first daemon on 127.0.0.1:7373. Hybrid Graph-RAG, six-term scoring,
-            sentence-transformers MiniLM embeddings, SQLite + sqlite-vec store.
+            sentence-transformers MiniLM embeddings, SQLite + sqlite-vec store. v1.1
+            adds a versioned protocol, a VS Code extension, and provider-shim
+            middleware for OpenAI / Anthropic / Google / Ollama.
           </p>
         </header>
 

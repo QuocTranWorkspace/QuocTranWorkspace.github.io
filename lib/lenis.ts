@@ -3,7 +3,6 @@
 import Lenis from "lenis";
 
 let instance: Lenis | null = null;
-let rafId: number | null = null;
 
 export function getLenis(): Lenis | null {
   return instance;
@@ -13,6 +12,9 @@ export function getLenis(): Lenis | null {
  * Bootstraps a singleton Lenis instance. Safe to call repeatedly; later calls
  * are no-ops. Honors prefers-reduced-motion: returns null and leaves native
  * scroll alone when the user has reduced-motion turned on.
+ *
+ * Caller (SmoothScrollProvider) is responsible for driving lenis.raf via
+ * gsap.ticker so we don't fight a second internal RAF loop.
  */
 export function bootLenis(): Lenis | null {
   if (typeof window === "undefined") return null;
@@ -29,20 +31,14 @@ export function bootLenis(): Lenis | null {
     touchMultiplier: 1.5,
   });
 
-  const raf = (time: number) => {
-    instance?.raf(time);
-    rafId = requestAnimationFrame(raf);
-  };
-  rafId = requestAnimationFrame(raf);
+  if (process.env.NODE_ENV !== "production") {
+    (window as unknown as { __lenis?: Lenis }).__lenis = instance;
+  }
 
   return instance;
 }
 
 export function destroyLenis() {
-  if (rafId !== null) {
-    cancelAnimationFrame(rafId);
-    rafId = null;
-  }
   instance?.destroy();
   instance = null;
 }

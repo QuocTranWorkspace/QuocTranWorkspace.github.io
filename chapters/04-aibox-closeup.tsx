@@ -27,15 +27,17 @@ export function AIBoxCloseup() {
       <div className="container-edge">
         <header className="mb-14 max-w-3xl space-y-3">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
-            Chapter 04 · AIBox closeup
+            Chapter 04 · AIBox closeup · two production deployments
           </p>
           <h2 className="font-display text-5xl md:text-7xl text-balance">
-            Edge AI that actually runs at a Hanoi gas station.
+            Edge AI live at Noi Bai airport and a 110 kV substation.
           </h2>
           <p className="text-ink-mute text-lg max-w-2xl">
-            One Jetson box, four RTSP cameras, real-time bounding boxes streamed back
-            to the cloud over WebRTC. WebSocket events, MJPEG fallback, PostgreSQL +
-            pgvector for the analytics tail.
+            Shipped to <span className="text-ink">Petrolimex Aviation at Noi Bai International Airport</span>{" "}
+            and <span className="text-ink">EVN&rsquo;s 110 kV Mo Lao substation</span>. One Jetson box per site,
+            four RTSP cameras, real-time bounding boxes streamed back to the cloud over
+            WebRTC. WebSocket events, MJPEG fallback, PostgreSQL + pgvector for the
+            analytics tail.
           </p>
         </header>
 

@@ -13,45 +13,45 @@ const tiles: Tile[] = [
     slug: "aibox",
     name: "AIBox",
     tagline:
-      "Production multi-camera surveillance on NVIDIA Jetson — 10+ YOLO models, real-time WebRTC/RTSP/MJPEG, 50+ REST endpoints.",
-    stack: ["FastAPI", "PyTorch", "pgvector", "Jetson", "WebRTC"],
+      "Production multi-camera surveillance on NVIDIA Jetson — 10+ YOLO models (helmet / oil-spill / smoke / plate / face), real-time WebRTC/RTSP/MJPEG, 50+ REST endpoints across 9 routers.",
+    stack: ["FastAPI", "PyTorch", "Ultralytics YOLO", "pgvector", "FaceNet", "Jetson"],
     span: "wide",
   },
   {
     slug: "aicloud",
     name: "AICloud",
     tagline:
-      "Multi-tenant SaaS to manage AIBox fleets — RBAC across four roles, automated Ubuntu deploys, full DB seeding pipeline.",
-    stack: ["NestJS", "Prisma", "React", "React Native"],
+      "Multi-tenant SaaS to manage AIBox fleets. Web dashboard + companion mobile app, RBAC across four roles, automated Ubuntu deploys, full DB seeding pipeline.",
+    stack: ["NestJS", "Prisma", "React 19", "React Native"],
   },
   {
-    slug: "ai-assistant",
-    name: "AI Assistant Platform",
+    slug: "unlimit",
+    name: "Unlimit",
     tagline:
-      "Five-service Python microservice system behind HAProxy. Document ingestion, pgvector search, Llama 3.1 NL querying.",
-    stack: ["Python", "FastAPI", "HAProxy", "pgvector", "Llama 3.1"],
+      "Multi-tenant WhatsApp integration platform. Express + Sequelize backend with a separate worker, Bull queues on Redis, granular permissions matrix, MinIO + Mailhog dev stack.",
+    stack: ["Node.js", "Express", "Sequelize", "Redis", "Bull", "React 19", "TanStack"],
+  },
+  {
+    slug: "swisslife",
+    name: "Swisslife",
+    tagline:
+      "Microservices platform behind a Kong gateway: auth, config, envoi, recipient, audit, email. NATS JetStream messaging, full observability stack, Postgres + ElasticSearch + MinIO storage.",
+    stack: ["Microservices", "Kong", "NATS JetStream", "Postgres", "ElasticSearch", "Jaeger", "Prometheus"],
     span: "tall",
   },
   {
-    slug: "apst",
-    name: "APST",
+    slug: "keanu",
+    name: "Keanu",
     tagline:
-      "10-microservice Go platform on GKE for a French tourism association of 12,000+ member companies. Clean Architecture + DDD.",
-    stack: ["Go 1.25", "GKE", "gRPC", "Event-driven"],
+      "Reservation / booking system with a Gemini-powered intelligence layer. React 19 + Vite frontend, NestJS backend with a dedicated reservations module.",
+    stack: ["React 19", "Vite", "NestJS", "Gemini"],
   },
   {
-    slug: "afd",
-    name: "AFD",
+    slug: "ham-cap",
+    name: "ham-cap",
     tagline:
-      "High-perf Go CLI processing 300K+ booking records — 7-step checkpoint/resume, SQLite persistence, Uber FX DI.",
-    stack: ["Go 1.25", "SQLite", "Uber FX"],
-  },
-  {
-    slug: "evolution-api",
-    name: "Evolution API",
-    tagline:
-      "Extended an open-source multi-tenant WhatsApp platform — Baileys, Meta Business, OpenAI, Typebot, RabbitMQ, S3.",
-    stack: ["TypeScript", "Node.js", "Baileys", "RabbitMQ"],
+      "AIBox sibling for sensor-data deployments. NestJS cloud backend, Postgres + MinIO, automated Ubuntu provisioning script, Docker Compose stack.",
+    stack: ["NestJS", "Postgres", "MinIO", "Docker Compose"],
   },
 ];
 
@@ -77,7 +77,7 @@ export function LeadArc() {
         </h2>
         <p className="text-ink-mute text-lg max-w-2xl">
           Promoted to Technical Lead in December. I own architecture, code review,
-          roadmap, and on-call rituals across these six surfaces.
+          roadmap, and on-call rituals across the surfaces below.
         </p>
       </header>
 
@@ -101,6 +101,18 @@ export function LeadArc() {
             </ul>
           </li>
         ))}
+
+        <li
+          aria-hidden
+          className={cn(
+            "group relative flex items-center justify-center rounded-2xl border border-dashed rule bg-transparent p-6",
+            "transition-colors hover:border-accent/40 hover:text-accent",
+          )}
+        >
+          <span className="font-mono text-sm uppercase tracking-[0.3em] text-ink-mute">
+            and many more&hellip;
+          </span>
+        </li>
       </ul>
     </section>
   );

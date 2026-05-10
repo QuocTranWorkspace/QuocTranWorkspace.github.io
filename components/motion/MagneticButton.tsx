@@ -3,6 +3,7 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, type ComponentPropsWithoutRef } from "react";
 import { cn } from "@/lib/utils";
+import { getLenis } from "@/lib/lenis";
 
 type MagneticButtonProps = ComponentPropsWithoutRef<typeof motion.a> & {
   strength?: number;
@@ -43,11 +44,27 @@ export function MagneticButton({
     y.set(0);
   };
 
+  const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const href = (rest.href ?? "").toString();
+    if (!href.startsWith("#")) return;
+    const target = document.getElementById(href.slice(1));
+    if (!target) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const lenis = getLenis();
+    if (lenis) {
+      lenis.scrollTo(target, { duration: 1.4, lock: true });
+    } else {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <motion.a
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={reset}
+      onClick={onClick}
       style={{ x: sx, y: sy }}
       className={cn(
         "inline-flex items-center gap-3 rounded-full border border-accent/40 bg-bg-elev px-6 py-3",
