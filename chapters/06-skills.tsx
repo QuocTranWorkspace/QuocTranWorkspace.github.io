@@ -164,18 +164,25 @@ export function Skills() {
           variants={cardVariants}
           className="text-ink-mute text-sm max-w-xl"
         >
-          Hover a cluster to see the edges that link it to the rest of the
-          stack — these are the typical seams the projects on this site cross.
+          <span className="lg:hidden">
+            Eight clusters, one stack. Languages feed Backends, Backends sit on
+            Data, Data sits on Infra; AI/ML borrows from each.
+          </span>
+          <span className="hidden lg:inline">
+            Hover a cluster to see the edges that link it to the rest of the
+            stack — these are the typical seams the projects on this site cross.
+          </span>
         </motion.p>
       </motion.header>
 
       <div className="relative">
         {/* SVG connector layer — drawn behind the cards so edges visibly bridge
             adjacent clusters. preserveAspectRatio:'none' so the curves stretch
-            with the card grid. */}
+            with the card grid. Hidden below lg where the grid collapses out
+            of the 4x2 layout the edge coordinates were designed against. */}
         <svg
           aria-hidden
-          className="pointer-events-none absolute inset-0 h-full w-full"
+          className="pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
           preserveAspectRatio="none"
         >
@@ -296,9 +303,13 @@ export function Skills() {
       </div>
 
       <p className="mt-10 max-w-2xl text-ink-mute text-sm">
-        Each thin curve marks a seam between clusters that show up together in
-        the projects above — Languages ↔ Backend, AI/ML ↔ Edge, Backend ↔ Data,
-        and so on. Reduced-motion users see the same layout without the draw-in.
+        <span className="hidden lg:inline">
+          Each thin curve marks a seam between clusters that show up together
+          in the projects above — Languages ↔ Backend, AI/ML ↔ Edge,
+          Backend ↔ Data, and so on.{" "}
+        </span>
+        These are the typical seams the projects on this site cross. Reduced-motion
+        users see the same layout without the draw-in.
       </p>
     </section>
   );
