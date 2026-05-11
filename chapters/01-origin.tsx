@@ -61,9 +61,22 @@ export function Origin() {
     }
 
     const ctx = gsap.context(() => {
-      // Distance the horizontal track must travel = (trackWidth - viewport).
-      // Pin distance = same, so vertical scroll progress maps 1:1 to translate.
-      const getDistance = () => track.scrollWidth - pin.clientWidth;
+      // Distance the horizontal track must travel so the LAST card's right
+      // edge lands at (viewport-right minus the track's right padding) — i.e.
+      // the trailing card has the same gutter the leading card does.
+      //
+      // Flex containers' scrollWidth excludes trailing padding when content
+      // overflows, so adding paddingRight explicitly is required. Using the
+      // last child's offsetLeft + offsetWidth pins the math to the actual
+      // card layout rather than relying on scrollWidth at all.
+      const getDistance = () => {
+        const last = track.lastElementChild as HTMLElement | null;
+        const rightPad =
+          parseFloat(getComputedStyle(track).paddingRight) || 0;
+        if (!last) return 0;
+        const totalContentRight = last.offsetLeft + last.offsetWidth + rightPad;
+        return Math.max(0, totalContentRight - pin.clientWidth);
+      };
 
       const tween = gsap.to(track, {
         x: () => -getDistance(),
@@ -74,11 +87,14 @@ export function Origin() {
           end: () => `+=${getDistance()}`,
           pin: pin,
           pinSpacing: true,
-          scrub: 0.8,
+          // `scrub: true` keeps the track exactly synced to scroll position.
+          // With a numeric lag (e.g. 0.8) the user could finish the pin
+          // before the track caught up to its end -- partially clipping the
+          // last card at the right edge. True = no lag, no clip.
+          scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            // Map scroll progress to active milestone index (one card wide each).
             const idx = Math.min(
               milestones.length - 1,
               Math.floor(self.progress * milestones.length),
@@ -94,12 +110,23 @@ export function Origin() {
       };
     }, outer);
 
-    // Recalc on resize / font swap.
+    // Things that can move the layout AFTER ScrollTrigger first measures:
+    // font swap, image decode, lazy-mounted siblings. Refresh on each so
+    // the distance recalculates with the final layout dimensions. Without
+    // these refreshes, browser zoom (110-150 percent) frequently leaves
+    // the track over- or under-translated at the end of the pin.
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener("resize", refresh);
+    window.addEventListener("load", refresh);
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(refresh).catch(() => undefined);
+    }
+    const settleTimer = setTimeout(refresh, 350);
 
     return () => {
       window.removeEventListener("resize", refresh);
+      window.removeEventListener("load", refresh);
+      clearTimeout(settleTimer);
       ctx.revert();
     };
   }, []);
@@ -111,8 +138,17 @@ export function Origin() {
       data-chapter="origin"
       className={cn("relative bg-bg")}
     >
-      <div ref={pinRef} className="relative h-svh w-full overflow-hidden">
-        <div className="container-edge pt-24">
+      <div
+        ref={pinRef}
+        className={cn(
+          "relative w-full py-24 lg:py-0",
+          // Pin / clip behavior only kicks in on lg+ where the horizontal
+          // scrub runs. Below lg, the chapter is a normal vertical stack
+          // and must be free to grow with its content.
+          "lg:h-svh lg:overflow-hidden",
+        )}
+      >
+        <div className="container-edge lg:pt-24">
           <header className="max-w-3xl space-y-3 mb-10">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
               Chapter 01 · Origin
@@ -136,16 +172,28 @@ export function Origin() {
           </span>
         </div>
 
-        {/* The horizontal track. On lg+ this gets translated via GSAP. Below
-            lg it remains a vertical stack inside container-edge. */}
-        <div className="container-edge">
+        {/*
+          The horizontal track.
+          - Below lg: stacked vertically inside a max-width 1280 centered
+            container (mimicking container-edge).
+          - On lg+: the wrapper releases the max-width / padding so the track
+            spans full viewport width. The track itself carries symmetric
+            left + right padding (matching container-edge's clamp), and the
+            distance calc below ends with the last card's right edge offset
+            from viewport right by exactly that right-pad value.
+        */}
+        <div
+          className={cn(
+            "mx-auto w-full max-w-[1280px] px-[clamp(1.25rem,4vw,4rem)]",
+            "lg:max-w-none lg:px-0",
+          )}
+        >
           <div
             ref={trackRef}
             className={cn(
               "flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-10",
-              // Trailing space on the right so the last card has breathing
-              // room when it reaches viewport right edge.
-              "lg:pr-[20vw] lg:will-change-transform",
+              "lg:pl-[clamp(1.25rem,4vw,4rem)] lg:pr-[clamp(1.25rem,4vw,4rem)]",
+              "lg:will-change-transform",
             )}
           >
             {milestones.map((m, i) => (
