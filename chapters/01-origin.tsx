@@ -228,9 +228,11 @@ export function Origin() {
           </div>
         </div>
 
-        {/* Scroll hint, hidden when the user has already engaged. Hidden
-            below xl as well to give narrow lg viewports more vertical room. */}
-        <p className="container-edge mt-6 xl:mt-10 hidden xl:block font-mono text-xs uppercase tracking-widest text-ink-mute">
+        {/* Scroll hint -- absolutely positioned to the bottom-right of the
+            pin so it never competes with the year-rail for vertical space.
+            Below lg the pin isn't pinned at all (lg:h-svh lg:overflow-hidden)
+            so the hint stays hidden on mobile / tablet. */}
+        <p className="pointer-events-none absolute bottom-6 right-[clamp(1.25rem,4vw,4rem)] hidden font-mono text-[11px] uppercase tracking-[0.25em] text-ink-mute lg:block">
           Scroll to advance →
         </p>
       </div>

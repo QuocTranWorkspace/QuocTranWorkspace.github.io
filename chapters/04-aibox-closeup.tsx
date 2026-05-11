@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
+import Image from "next/image";
 import { useRef } from "react";
 import { Counter } from "@/components/motion/Counter";
 import { cn } from "@/lib/utils";
@@ -21,16 +22,6 @@ const models = [
   "petrolimex uniform",
 ];
 
-// Mock YOLO detection boxes (positioned as percentages of the frame).
-// They draw in over the scroll progress so a recruiter sees the system
-// "detect" things in real time as they read the chapter.
-const detections = [
-  { id: "helmet", label: "helmet 0.92", x: 18, y: 22, w: 28, h: 24, delay: 0.05 },
-  { id: "face", label: "face 0.88", x: 22, y: 28, w: 16, h: 18, delay: 0.18 },
-  { id: "vest", label: "vest 0.81", x: 12, y: 48, w: 32, h: 28, delay: 0.32 },
-  { id: "plate", label: "plate 0.95", x: 56, y: 60, w: 30, h: 14, delay: 0.5 },
-];
-
 const headerVariants: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
@@ -48,8 +39,7 @@ const headerItem: Variants = {
 const viewportOpts = { once: true, amount: 0.25 };
 
 export function AIBoxCloseup() {
-  // Drive the bbox draw-on from scroll progress through the section so the
-  // detections feel scrubbed, not auto-played.
+  // scrollYProgress drives the scan-line sweep over the real detection frame.
   const sectionRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -156,7 +146,9 @@ export function AIBoxCloseup() {
             </motion.p>
           </motion.div>
 
-          {/* Mock detection frame — bbox draws scrub with scroll */}
+          {/* Real production frame from Petrolimex Aviation, Noi Bai cam 001.
+              The image already carries the live YOLO bounding boxes -- our
+              overlay is just the CCTV HUD + a scrub-driven scan line. */}
           <DetectionFrame scrollYProgress={scrollYProgress} />
         </div>
       </div>
@@ -169,102 +161,66 @@ type DetectionFrameProps = {
 };
 
 function DetectionFrame({ scrollYProgress }: DetectionFrameProps) {
-  // Map the section's scroll progress to a 0..1 detection draw value.
-  // Use 0.25..0.7 of section progress (visible mid-scroll) for the reveal.
-  const draw = useTransform(scrollYProgress, [0.25, 0.7], [0, 1]);
+  // A horizontal scan line sweeps top-to-bottom as the user scrolls the
+  // section. Maps section-progress 0.25..0.85 -> 0%..100% of the frame.
+  const scanY = useTransform(scrollYProgress, [0.25, 0.85], ["0%", "100%"]);
 
   return (
-    <motion.div
+    <motion.figure
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={viewportOpts}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-      className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border rule bg-bg-elev"
+      className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border rule bg-bg-elev"
     >
-      {/* CCTV-feel background — radial vignette + scan lines */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#1f2330_0%,#0B0D12_70%)]"
+      <Image
+        src="/media/aibox-noibai-001.jpg"
+        alt="Live frame from AIBox at Petrolimex Aviation, Noi Bai: a refueling truck and ground crew with YOLO bounding boxes drawn around helmets, vests, and a flagged PPE-negative person."
+        fill
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        priority={false}
+        className="object-cover"
       />
+
+      {/* Slight darken so the HUD reads on top */}
       <div
         aria-hidden
-        className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
+        className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40"
+      />
+
+      {/* Subtle scan-line overlay (CRT feel) */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.07] mix-blend-overlay"
         style={{
           backgroundImage:
             "repeating-linear-gradient(0deg, transparent 0 2px, rgba(255,255,255,0.5) 2px 3px)",
         }}
       />
 
+      {/* Scrub-driven scan line */}
+      <motion.div
+        aria-hidden
+        className="absolute inset-x-0 h-px bg-accent/80 shadow-[0_0_12px_2px_rgba(108,229,199,0.6)]"
+        style={{ top: scanY }}
+      />
+
       {/* Camera HUD */}
-      <div className="absolute inset-0 p-4 flex flex-col justify-between font-mono text-[10px] uppercase tracking-widest text-accent/80">
+      <figcaption className="absolute inset-0 flex flex-col justify-between p-4 font-mono text-[10px] uppercase tracking-widest text-accent/90">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-2">
             <span className="size-1.5 rounded-full bg-accent animate-pulse" />
-            CAM-02 · LIVE
+            AIB-PA-NOIBAI-001 · LIVE
           </span>
           <span>1920×1080 · 25 fps</span>
         </div>
         <div className="flex items-center justify-between text-ink-mute">
-          <span>RTSP://noibai-aux-02</span>
+          <span className="truncate max-w-[60%]">
+            aivision.petrolimexaviation.com
+          </span>
           <span>WebRTC ↔ Cloud</span>
         </div>
-      </div>
-
-      {/* Detection boxes (SVG so we can animate stroke-dashoffset cleanly) */}
-      <svg
-        aria-hidden
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        {detections.map((d) => (
-          <DetectionBox key={d.id} det={d} progress={draw} />
-        ))}
-      </svg>
-    </motion.div>
-  );
-}
-
-type DetectionBoxProps = {
-  det: (typeof detections)[number];
-  progress: ReturnType<typeof useTransform<number, number>>;
-};
-
-function DetectionBox({ det, progress }: DetectionBoxProps) {
-  // Each box has its own slot in the master progress (0..1). It draws when
-  // progress is between delay and delay + 0.4.
-  const start = det.delay;
-  const end = Math.min(1, det.delay + 0.4);
-  const localProgress = useTransform(progress, [start, end], [0, 1], {
-    clamp: true,
-  });
-  const opacity = useTransform(localProgress, [0, 0.05, 1], [0, 1, 1]);
-  const perimeter = (det.w + det.h) * 2;
-  const offset = useTransform(localProgress, [0, 1], [perimeter, 0]);
-
-  return (
-    <motion.g style={{ opacity }}>
-      <motion.rect
-        x={det.x}
-        y={det.y}
-        width={det.w}
-        height={det.h}
-        fill="none"
-        stroke="#6CE5C7"
-        strokeWidth={0.4}
-        strokeDasharray={perimeter}
-        style={{ strokeDashoffset: offset, vectorEffect: "non-scaling-stroke" }}
-      />
-      <motion.text
-        x={det.x + 1}
-        y={det.y - 1.2}
-        fill="#6CE5C7"
-        fontSize={2.2}
-        fontFamily="JetBrains Mono, monospace"
-        style={{ opacity }}
-      >
-        {det.label}
-      </motion.text>
-    </motion.g>
+      </figcaption>
+    </motion.figure>
   );
 }
