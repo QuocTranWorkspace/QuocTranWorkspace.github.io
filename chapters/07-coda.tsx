@@ -80,6 +80,7 @@ export function Coda() {
           <button
             type="button"
             onClick={copyEmail}
+            aria-label={`Copy email address ${EMAIL} to clipboard`}
             className={cn(
               "group flex w-full items-baseline justify-between gap-4 rounded-xl border rule bg-bg-elev/60 px-5 py-4 text-left",
               "transition-all hover:border-accent/60 hover:bg-bg-elev focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",

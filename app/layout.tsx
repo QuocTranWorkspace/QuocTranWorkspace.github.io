@@ -58,6 +58,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(fontVariables, "antialiased")}>
       <body className="bg-bg text-ink">
+        {/* Skip-to-content for keyboard users; appears only when focused. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:border focus:border-accent/60 focus:bg-bg-elev focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest focus:text-accent"
+        >
+          Skip to content
+        </a>
         <SmoothScrollProvider>
           <ToastProvider>
             {children}

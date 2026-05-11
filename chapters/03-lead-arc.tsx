@@ -1,6 +1,9 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { workSlugs } from "@/content/work";
 import { cn } from "@/lib/utils";
 
 type Tile = {
@@ -137,37 +140,63 @@ export function LeadArc() {
         variants={tileContainer}
         className="grid grid-cols-1 gap-4 md:grid-cols-3 md:auto-rows-[18rem]"
       >
-        {tiles.map((t) => (
-          <motion.li
-            key={t.slug}
-            variants={tileItem}
-            whileHover={{ y: -4, transition: { duration: 0.25, ease: "easeOut" } }}
-            className={cn(
-              "group relative flex flex-col justify-between overflow-hidden rounded-2xl border rule bg-bg-elev/60 p-6 transition-colors hover:border-accent/40 hover:bg-bg-elev",
-              spanClass[t.span ?? "default"],
-            )}
-          >
-            {/* Soft accent glow on hover — sits behind content, never grabs clicks */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-accent/0 via-accent/0 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:from-accent/5 group-hover:to-accent/0 group-hover:opacity-100"
-            />
-            <div className="relative space-y-3">
-              <h3 className="font-display text-3xl">{t.name}</h3>
-              <p className="text-ink-mute text-sm leading-relaxed">{t.tagline}</p>
-            </div>
-            <ul className="relative mt-6 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
-              {t.stack.map((s) => (
-                <li
-                  key={s}
-                  className="transition-colors group-hover:text-ink"
+        {tiles.map((t) => {
+          const hasDeepDive = workSlugs.includes(t.slug);
+          // A tile is interactive when it links to a /work page; otherwise it
+          // stays a static <li> so we don't promise a destination that 404s.
+          const inner = (
+            <>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-accent/0 via-accent/0 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:from-accent/5 group-hover:to-accent/0 group-hover:opacity-100"
+              />
+              <div className="relative space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-display text-3xl">{t.name}</h3>
+                  {hasDeepDive ? (
+                    <ArrowUpRight
+                      className="size-5 shrink-0 text-ink-mute transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+                      aria-hidden
+                    />
+                  ) : null}
+                </div>
+                <p className="text-ink-mute text-sm leading-relaxed">
+                  {t.tagline}
+                </p>
+              </div>
+              <ul className="relative mt-6 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
+                {t.stack.map((s) => (
+                  <li key={s} className="transition-colors group-hover:text-ink">
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </>
+          );
+          return (
+            <motion.li
+              key={t.slug}
+              variants={tileItem}
+              whileHover={{ y: -4, transition: { duration: 0.25, ease: "easeOut" } }}
+              className={cn(
+                "group relative flex flex-col justify-between overflow-hidden rounded-2xl border rule bg-bg-elev/60 transition-colors hover:border-accent/40 hover:bg-bg-elev",
+                spanClass[t.span ?? "default"],
+              )}
+            >
+              {hasDeepDive ? (
+                <Link
+                  href={`/work/${t.slug}`}
+                  aria-label={`Read the ${t.name} deep dive`}
+                  className="flex h-full flex-col justify-between p-6 focus-visible:outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
-                  {s}
-                </li>
-              ))}
-            </ul>
-          </motion.li>
-        ))}
+                  {inner}
+                </Link>
+              ) : (
+                <div className="flex h-full flex-col justify-between p-6">{inner}</div>
+              )}
+            </motion.li>
+          );
+        })}
 
         <motion.li
           variants={tileItem}

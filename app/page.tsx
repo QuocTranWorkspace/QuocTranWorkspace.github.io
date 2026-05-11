@@ -9,7 +9,7 @@ import { Coda } from "@/chapters/07-coda";
 
 export default function HomePage() {
   return (
-    <main>
+    <main id="main-content">
       <ColdOpen />
       <Origin />
       <Crossover />
