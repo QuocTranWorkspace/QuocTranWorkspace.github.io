@@ -3,6 +3,7 @@ import { fontVariables } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { SideDots } from "@/components/nav/SideDots";
+import { ToastProvider } from "@/components/ui/Toast";
 import "@/styles/globals.css";
 
 const siteUrl = "https://quoctran.dev";
@@ -58,8 +59,10 @@ export default function RootLayout({
     <html lang="en" className={cn(fontVariables, "antialiased")}>
       <body className="bg-bg text-ink">
         <SmoothScrollProvider>
-          {children}
-          <SideDots />
+          <ToastProvider>
+            {children}
+            <SideDots />
+          </ToastProvider>
         </SmoothScrollProvider>
       </body>
     </html>

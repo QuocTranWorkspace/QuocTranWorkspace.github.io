@@ -1,3 +1,6 @@
+"use client";
+
+import { motion, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type Tile = {
@@ -61,6 +64,40 @@ const spanClass: Record<NonNullable<Tile["span"]>, string> = {
   default: "",
 };
 
+const headerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+};
+
+const headerItem: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const tileContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.06, delayChildren: 0.05 },
+  },
+};
+
+const tileItem: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const viewportOpts = { once: true, amount: 0.15 };
+
 export function LeadArc() {
   return (
     <section
@@ -68,52 +105,84 @@ export function LeadArc() {
       data-chapter="lead-arc"
       className={cn("chapter container-edge py-24")}
     >
-      <header className="mb-12 max-w-3xl space-y-3">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
+      <motion.header
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportOpts}
+        variants={headerVariants}
+        className="mb-12 max-w-3xl space-y-3"
+      >
+        <motion.p
+          variants={headerItem}
+          className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
+        >
           Chapter 03 · Lead arc · PathTech, Jul 2025 → present
-        </p>
-        <h2 className="font-display text-5xl md:text-7xl text-balance">
+        </motion.p>
+        <motion.h2
+          variants={headerItem}
+          className="font-display text-5xl md:text-7xl text-balance"
+        >
           Six months in, I was leading the AI + cloud workstreams.
-        </h2>
-        <p className="text-ink-mute text-lg max-w-2xl">
-          Promoted to Technical Lead in December. I own architecture, code review,
-          roadmap, and on-call rituals across the surfaces below.
-        </p>
-      </header>
+        </motion.h2>
+        <motion.p variants={headerItem} className="text-ink-mute text-lg max-w-2xl">
+          Promoted to Technical Lead in December. I own architecture, code
+          review, roadmap, and on-call rituals across the surfaces below.
+        </motion.p>
+      </motion.header>
 
-      <ul className="grid grid-cols-1 gap-4 md:grid-cols-3 md:auto-rows-[18rem]">
+      <motion.ul
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportOpts}
+        variants={tileContainer}
+        className="grid grid-cols-1 gap-4 md:grid-cols-3 md:auto-rows-[18rem]"
+      >
         {tiles.map((t) => (
-          <li
+          <motion.li
             key={t.slug}
+            variants={tileItem}
+            whileHover={{ y: -4, transition: { duration: 0.25, ease: "easeOut" } }}
             className={cn(
-              "group relative flex flex-col justify-between rounded-2xl border rule bg-bg-elev/60 p-6 transition-all hover:border-accent/40 hover:bg-bg-elev",
+              "group relative flex flex-col justify-between overflow-hidden rounded-2xl border rule bg-bg-elev/60 p-6 transition-colors hover:border-accent/40 hover:bg-bg-elev",
               spanClass[t.span ?? "default"],
             )}
           >
-            <div className="space-y-3">
+            {/* Soft accent glow on hover — sits behind content, never grabs clicks */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-accent/0 via-accent/0 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:from-accent/5 group-hover:to-accent/0 group-hover:opacity-100"
+            />
+            <div className="relative space-y-3">
               <h3 className="font-display text-3xl">{t.name}</h3>
               <p className="text-ink-mute text-sm leading-relaxed">{t.tagline}</p>
             </div>
-            <ul className="mt-6 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
+            <ul className="relative mt-6 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
               {t.stack.map((s) => (
-                <li key={s}>{s}</li>
+                <li
+                  key={s}
+                  className="transition-colors group-hover:text-ink"
+                >
+                  {s}
+                </li>
               ))}
             </ul>
-          </li>
+          </motion.li>
         ))}
 
-        <li
+        <motion.li
+          variants={tileItem}
+          whileHover={{ y: -4, transition: { duration: 0.25, ease: "easeOut" } }}
           aria-hidden
           className={cn(
             "group relative flex items-center justify-center rounded-2xl border border-dashed rule bg-transparent p-6",
-            "transition-colors hover:border-accent/40 hover:text-accent",
+            "transition-colors hover:border-accent/40",
           )}
         >
-          <span className="font-mono text-sm uppercase tracking-[0.3em] text-ink-mute">
+          <span className="font-mono text-sm uppercase tracking-[0.3em] text-ink-mute transition-colors group-hover:text-accent">
             and many more&hellip;
           </span>
-        </li>
-      </ul>
+        </motion.li>
+      </motion.ul>
     </section>
   );
 }
