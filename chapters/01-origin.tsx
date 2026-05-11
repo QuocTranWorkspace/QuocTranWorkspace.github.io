@@ -148,12 +148,12 @@ export function Origin() {
           "lg:h-svh lg:overflow-hidden",
         )}
       >
-        <div className="container-edge lg:pt-24">
-          <header className="max-w-3xl space-y-3 mb-10">
+        <div className="container-edge lg:pt-12 xl:pt-20">
+          <header className="max-w-3xl space-y-2 mb-6 lg:mb-4 xl:mb-8 lg:space-y-3">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
               Chapter 01 · Origin
             </p>
-            <h2 className="font-display text-5xl md:text-7xl text-balance">
+            <h2 className="font-display text-balance text-4xl md:text-5xl lg:text-4xl xl:text-6xl 2xl:text-7xl leading-[1.05]">
               The first three years happened on a single laptop in Hanoi.
             </h2>
           </header>
@@ -162,9 +162,9 @@ export function Origin() {
         {/* Year ticker — sticks to the left edge, swaps as scrub progresses */}
         <div
           aria-hidden
-          className="container-edge mb-6 hidden lg:flex items-baseline gap-6"
+          className="container-edge hidden lg:flex items-baseline gap-6 mb-4 xl:mb-6"
         >
-          <span className="font-display text-7xl text-accent leading-none">
+          <span className="font-display text-accent leading-none text-5xl xl:text-6xl 2xl:text-7xl">
             {milestones[activeIndex]?.year ?? milestones[0]?.year}
           </span>
           <span className="font-mono text-xs uppercase tracking-widest text-ink-mute">
@@ -200,8 +200,9 @@ export function Origin() {
               <article
                 key={m.year + m.title}
                 className={cn(
-                  "relative shrink-0 rounded-2xl border rule bg-bg-elev/60 p-8 transition-colors",
-                  "lg:w-[26rem]",
+                  "relative shrink-0 rounded-2xl border rule bg-bg-elev/60 transition-colors",
+                  "p-6 xl:p-8",
+                  "lg:w-[20rem] xl:w-[24rem] 2xl:w-[26rem]",
                   i === activeIndex && "lg:border-accent/40",
                 )}
                 aria-current={i === activeIndex ? "true" : undefined}
@@ -209,16 +210,16 @@ export function Origin() {
                 <p className="stat text-xs uppercase tracking-widest text-ink-mute">
                   {m.year}
                 </p>
-                <h3 className="mt-4 font-display text-3xl leading-tight">
+                <h3 className="mt-3 xl:mt-4 font-display text-2xl xl:text-3xl leading-tight">
                   {m.title}
                 </h3>
-                <p className="mt-4 text-ink-mute text-base leading-relaxed">
+                <p className="mt-3 xl:mt-4 text-ink-mute text-sm xl:text-base leading-relaxed">
                   {m.detail}
                 </p>
                 <span
                   aria-hidden
                   className={cn(
-                    "mt-8 block h-px w-12 transition-colors",
+                    "mt-6 xl:mt-8 block h-px w-12 transition-colors",
                     i === activeIndex ? "bg-accent" : "bg-rule",
                   )}
                 />
@@ -227,8 +228,9 @@ export function Origin() {
           </div>
         </div>
 
-        {/* Scroll hint, hidden when the user has already engaged */}
-        <p className="container-edge mt-10 hidden lg:block font-mono text-xs uppercase tracking-widest text-ink-mute">
+        {/* Scroll hint, hidden when the user has already engaged. Hidden
+            below xl as well to give narrow lg viewports more vertical room. */}
+        <p className="container-edge mt-6 xl:mt-10 hidden xl:block font-mono text-xs uppercase tracking-widest text-ink-mute">
           Scroll to advance →
         </p>
       </div>
