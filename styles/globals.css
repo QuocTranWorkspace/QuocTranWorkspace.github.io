@@ -34,8 +34,18 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Hard guarantee: the page never scrolls sideways. `clip` (not `hidden`)
+     prevents horizontal scroll without creating a scroll container, so it
+     doesn't break Lenis, position:sticky, or the GSAP pin. */
+  html {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
   body {
     min-height: 100svh;
+    overflow-x: clip;
+    max-width: 100%;
     overscroll-behavior-y: none;
   }
 

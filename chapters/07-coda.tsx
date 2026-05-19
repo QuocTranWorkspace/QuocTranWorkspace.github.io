@@ -90,19 +90,19 @@ export function Coda() {
               onClick={copyEmail}
               aria-label={`Copy email address ${EMAIL} to clipboard`}
               className={cn(
-                "group flex w-full flex-wrap items-baseline justify-between gap-4 rounded-2xl border rule bg-bg-elev/60 px-6 py-6 text-left sm:px-8",
+                "group flex w-full flex-col gap-3 rounded-2xl border rule bg-bg-elev/60 px-6 py-6 text-left sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:px-8",
                 "transition-all hover:border-accent/60 hover:bg-bg-elev focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
               )}
             >
-              <span className="font-mono text-xs uppercase tracking-widest text-ink-mute">
+              <span className="shrink-0 font-mono text-xs uppercase tracking-widest text-ink-mute">
                 Email — tap to copy
               </span>
-              <span className="flex items-baseline gap-3">
-                <span className="font-display text-2xl text-ink transition-colors group-hover:text-accent sm:text-3xl">
+              <span className="flex min-w-0 items-baseline gap-3">
+                <span className="min-w-0 break-all font-display text-lg text-ink transition-colors group-hover:text-accent sm:text-2xl md:text-3xl">
                   {EMAIL}
                 </span>
                 <Copy
-                  className="size-4 self-center text-ink-mute transition-colors group-hover:text-accent"
+                  className="size-4 shrink-0 self-center text-ink-mute transition-colors group-hover:text-accent"
                   aria-hidden
                 />
               </span>

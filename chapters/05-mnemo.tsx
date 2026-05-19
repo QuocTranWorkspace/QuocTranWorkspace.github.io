@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Search } from "lucide-react";
+import { ArrowUpRight, Search } from "lucide-react";
 import { useDeferredValue, useMemo, useState } from "react";
+import { useMnemoVersion } from "@/lib/use-mnemo-version";
 import { cn } from "@/lib/utils";
 
 // ---------- Mock corpus & scoring (mirrors mnemo's six-term retrieval) ----------
@@ -226,14 +227,6 @@ const stats = [
   { value: "≤ 800", label: "tokens injected per prompt" },
 ];
 
-const roadmap = [
-  "v1.1 — shipped",
-  "v1.2 — learning to listen",
-  "v2 — code graph",
-  "v3 — chat surface",
-  "v4 — refinement",
-];
-
 const SUGGESTIONS = [
   "how does the scoring work",
   "alpine gotchas",
@@ -246,6 +239,7 @@ const DEFAULT_QUERY = "how does the scoring work";
 // ---------- Component ----------
 
 export function Mnemo() {
+  const mnemo = useMnemoVersion();
   const [query, setQuery] = useState(DEFAULT_QUERY);
   // Deferring keeps typing snappy while letting the heavier scoring math
   // settle a frame behind. (No real perf cost here — the corpus is tiny —
@@ -276,8 +270,28 @@ export function Mnemo() {
     >
       <div className="container-edge">
         <header className="mb-10 max-w-3xl space-y-3">
-          <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent-warm">
-            Chapter 05 · mnemo · v1.1.0 published
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-[0.3em] text-accent-warm">
+            <span>Chapter 05 · mnemo</span>
+            <a
+              href="https://github.com/mmct-jsc/mnemo/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              title={
+                mnemo.live
+                  ? "Live from GitHub releases"
+                  : "Build-time version (GitHub API unreachable)"
+              }
+              className="inline-flex items-center gap-1.5 rounded-full border border-accent-warm/40 px-2 py-0.5 normal-case tracking-normal text-accent-warm transition-colors hover:bg-accent-warm hover:text-bg"
+            >
+              <span
+                className={cn(
+                  "size-1.5 rounded-full bg-accent-warm",
+                  mnemo.live && "animate-pulse",
+                )}
+                aria-hidden
+              />
+              {mnemo.version} published
+            </a>
           </p>
           <h2 className="font-display text-5xl md:text-7xl text-balance">
             <span className="italic text-accent-warm">A memory layer</span> that
@@ -286,8 +300,9 @@ export function Mnemo() {
           <p className="text-ink-mute text-lg max-w-2xl text-balance">
             Local-first daemon on 127.0.0.1:7373. Hybrid Graph-RAG, six-term
             scoring, sentence-transformers MiniLM embeddings, SQLite + sqlite-vec
-            store. v1.1 adds a versioned protocol, a VS Code extension, and
-            provider-shim middleware for OpenAI / Anthropic / Google / Ollama.
+            store. Ships a versioned protocol, a VS Code extension, and
+            provider-shim middleware for OpenAI / Anthropic / Google / Ollama —
+            and keeps shipping (version above is live from GitHub).
           </p>
         </header>
 
@@ -437,30 +452,54 @@ export function Mnemo() {
           </AnimatePresence>
         </div>
 
-        <ol className="mt-12 flex flex-wrap gap-3 font-mono text-xs uppercase tracking-widest text-ink-mute">
-          {roadmap.map((r, i) => (
-            <li
-              key={r}
-              className={cn(
-                "rounded-full border rule px-3 py-1",
-                i === 0 && "border-accent-warm/50 text-accent-warm",
-              )}
+        {/* Live demo embed — the real mnemo "Nebula" UI, not a mock */}
+        <div className="mt-12">
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
+            <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-mute">
+              Live demo · the real UI
+            </p>
+            <a
+              href="https://mmct-jsc.github.io/mnemo/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-accent-warm transition-colors hover:underline underline-offset-4"
             >
-              {r}
-            </li>
-          ))}
-        </ol>
+              Open full-screen
+              <ArrowUpRight className="size-3.5" aria-hidden />
+            </a>
+          </div>
+          <div className="relative overflow-hidden rounded-2xl border rule bg-bg-elev">
+            <iframe
+              src="https://mmct-jsc.github.io/mnemo/"
+              title="mnemo live Nebula demo — interactive knowledge graph UI"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              sandbox="allow-scripts allow-same-origin allow-popups"
+              className="h-[clamp(420px,70vh,720px)] w-full border-0 bg-bg"
+            />
+          </div>
+        </div>
 
-        <p className="mt-10 text-ink-mute text-sm max-w-2xl">
-          Source:&nbsp;
+        <p className="mt-8 text-ink-mute text-sm max-w-2xl">
+          The query box above is a six-node mock that mirrors the scoring; the
+          embed is the real shipped demo. Source:&nbsp;
           <a
             href="https://github.com/mmct-jsc/mnemo"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-ink underline-offset-4 hover:underline"
           >
             github.com/mmct-jsc/mnemo
           </a>
-          . The corpus above is a six-node mock; the production daemon runs
-          the same six-term formula across hundreds of nodes in ~17 ms.
+          {mnemo.live ? (
+            <>
+              {" "}
+              · running <span className="text-accent-warm">{mnemo.version}</span>{" "}
+              as of your visit.
+            </>
+          ) : (
+            <>.</>
+          )}
         </p>
       </div>
     </section>
