@@ -54,75 +54,84 @@ export function Coda() {
         whileInView="visible"
         viewport={viewportOpts}
         variants={container}
-        className="space-y-10 max-w-3xl"
+        className="flex w-full flex-col gap-14"
       >
-        <motion.p
-          variants={item}
-          className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
-        >
-          Chapter 07 · Coda
-        </motion.p>
-
-        <motion.h2
-          variants={item}
-          className="font-display text-5xl md:text-8xl text-balance leading-[0.95]"
-        >
-          Let&rsquo;s talk.
-        </motion.h2>
-
-        <motion.p variants={item} className="text-ink-mute text-lg text-balance">
-          Open to <span className="text-ink">Full-Stack Engineer</span> and{" "}
-          <span className="text-ink">Technical Lead</span> roles. Hanoi-based,
-          GMT+7, response within one working day.
-        </motion.p>
-
-        <motion.div variants={item}>
-          <button
-            type="button"
-            onClick={copyEmail}
-            aria-label={`Copy email address ${EMAIL} to clipboard`}
-            className={cn(
-              "group flex w-full items-baseline justify-between gap-4 rounded-xl border rule bg-bg-elev/60 px-5 py-4 text-left",
-              "transition-all hover:border-accent/60 hover:bg-bg-elev focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
-            )}
+        {/* Heading row — headline left, intro balanced on the right at lg+ */}
+        <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-end">
+          <div className="space-y-5">
+            <motion.p
+              variants={item}
+              className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
+            >
+              Chapter 07 · Coda
+            </motion.p>
+            <motion.h2
+              variants={item}
+              className="font-display leading-[0.92] text-balance text-6xl md:text-8xl xl:text-[9.5rem]"
+            >
+              Let&rsquo;s talk.
+            </motion.h2>
+          </div>
+          <motion.p
+            variants={item}
+            className="text-ink-mute text-lg text-balance lg:pb-4"
           >
-            <span className="font-mono text-xs uppercase tracking-widest text-ink-mute">
-              Email
-            </span>
-            <span className="flex items-baseline gap-3">
-              <span className="font-display text-xl text-ink transition-colors group-hover:text-accent">
-                {EMAIL}
+            Open to <span className="text-ink">Full-Stack Engineer</span> and{" "}
+            <span className="text-ink">Technical Lead</span> roles. Hanoi-based,
+            GMT+7, response within one working day.
+          </motion.p>
+        </div>
+
+        {/* Contact rail — spans the full container width */}
+        <div className="space-y-4">
+          <motion.div variants={item}>
+            <button
+              type="button"
+              onClick={copyEmail}
+              aria-label={`Copy email address ${EMAIL} to clipboard`}
+              className={cn(
+                "group flex w-full flex-wrap items-baseline justify-between gap-4 rounded-2xl border rule bg-bg-elev/60 px-6 py-6 text-left sm:px-8",
+                "transition-all hover:border-accent/60 hover:bg-bg-elev focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
+              )}
+            >
+              <span className="font-mono text-xs uppercase tracking-widest text-ink-mute">
+                Email — tap to copy
               </span>
-              <Copy
-                className="size-3.5 self-center text-ink-mute transition-colors group-hover:text-accent"
-                aria-hidden
-              />
-            </span>
-          </button>
-        </motion.div>
-
-        <motion.ul variants={item} className="grid gap-4 sm:grid-cols-3">
-          {externalLinks.map((l) => (
-            <li key={l.label}>
-              <a
-                href={l.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col gap-1 rounded-xl border rule bg-bg-elev/40 px-5 py-4 transition-colors hover:border-accent/40 hover:bg-bg-elev"
-              >
-                <span className="font-mono text-xs uppercase tracking-widest text-ink-mute">
-                  {l.label}
+              <span className="flex items-baseline gap-3">
+                <span className="font-display text-2xl text-ink transition-colors group-hover:text-accent sm:text-3xl">
+                  {EMAIL}
                 </span>
-                <span className="font-display text-lg text-ink transition-colors group-hover:text-accent">
-                  {l.value}
-                </span>
-              </a>
-            </li>
-          ))}
-        </motion.ul>
+                <Copy
+                  className="size-4 self-center text-ink-mute transition-colors group-hover:text-accent"
+                  aria-hidden
+                />
+              </span>
+            </button>
+          </motion.div>
 
-        <motion.footer variants={item} className="pt-16 border-t rule">
-          <p className="font-mono text-xs text-ink-mute">
+          <motion.ul variants={item} className="grid gap-4 sm:grid-cols-3">
+            {externalLinks.map((l) => (
+              <li key={l.label}>
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex h-full flex-col gap-1 rounded-2xl border rule bg-bg-elev/40 px-6 py-5 transition-colors hover:border-accent/40 hover:bg-bg-elev"
+                >
+                  <span className="font-mono text-xs uppercase tracking-widest text-ink-mute">
+                    {l.label}
+                  </span>
+                  <span className="font-display text-xl text-ink transition-colors group-hover:text-accent">
+                    {l.value}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </motion.ul>
+        </div>
+
+        <motion.footer variants={item} className="border-t rule pt-10">
+          <p className="text-center font-mono text-xs text-ink-mute">
             Built with Next.js · Tailwind v4 · GSAP · Lenis · Framer Motion.
             Source on GitHub. © {new Date().getFullYear()} Quoc Tran Trung.
           </p>

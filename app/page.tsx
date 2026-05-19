@@ -6,10 +6,12 @@ import { AIBoxCloseup } from "@/chapters/04-aibox-closeup";
 import { Mnemo } from "@/chapters/05-mnemo";
 import { Skills } from "@/chapters/06-skills";
 import { Coda } from "@/chapters/07-coda";
+import { ScrollRestoration } from "@/components/providers/ScrollRestoration";
 
 export default function HomePage() {
   return (
     <main id="main-content">
+      <ScrollRestoration />
       <ColdOpen />
       <Origin />
       <Crossover />

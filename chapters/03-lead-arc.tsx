@@ -4,6 +4,7 @@ import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { workSlugs } from "@/content/work";
+import { rememberHomeScroll } from "@/lib/scroll-memory";
 import { cn } from "@/lib/utils";
 
 type Tile = {
@@ -186,6 +187,7 @@ export function LeadArc() {
               {hasDeepDive ? (
                 <Link
                   href={`/work/${t.slug}`}
+                  onClick={rememberHomeScroll}
                   aria-label={`Read the ${t.name} deep dive`}
                   className="flex h-full flex-col justify-between p-6 focus-visible:outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
