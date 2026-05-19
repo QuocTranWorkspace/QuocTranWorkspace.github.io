@@ -6,9 +6,15 @@ import { SideDots } from "@/components/nav/SideDots";
 import { ToastProvider } from "@/components/ui/Toast";
 import "@/styles/globals.css";
 
-const siteUrl = "https://quoctran.dev";
+const siteUrl = "https://quoctranworkspace.github.io";
 const description =
   "Full-stack engineer and technical lead. NVIDIA Jetson edge AI, Go on Kubernetes, local-first developer tooling. Creator of mnemo.";
+const ogImage = {
+  url: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: "Quoc Tran Trung — Full-Stack Engineer · Technical Lead",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -27,11 +33,13 @@ export const metadata: Metadata = {
     title: "Quoc Tran Trung — Full-Stack Engineer · Technical Lead",
     description,
     locale: "en_US",
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title: "Quoc Tran Trung",
     description,
+    images: [ogImage],
   },
   robots: {
     index: true,

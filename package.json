@@ -5,6 +5,8 @@
   "description": "Quoc Tran Trung — cinematic portfolio. Next.js 16 App Router, Tailwind v4, GSAP+ScrollTrigger, Lenis, Framer Motion.",
   "scripts": {
     "dev": "next dev",
+    "gen:og": "node scripts/gen-og.mjs",
+    "prebuild": "node scripts/gen-og.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -33,5 +35,6 @@
   },
   "engines": {
     "node": ">=20.10"
-  }
+  },
+  "packageManager": "pnpm@10.13.1"
 }
