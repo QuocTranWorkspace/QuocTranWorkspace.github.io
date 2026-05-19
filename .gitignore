@@ -44,6 +44,9 @@ next-env.d.ts
 !.vscode/extensions.json
 !.vscode/settings.json
 
+# generated at build (prebuild) — never commit, always regenerated
+/public/mnemo-version.json
+
 # local docs scratch
 .docs-temp/
 

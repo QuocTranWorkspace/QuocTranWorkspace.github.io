@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily rebuild so prebuild re-snapshots the latest mnemo release into
+  # public/mnemo-version.json with zero code pushes. 06:17 UTC — an
+  # off-the-hour minute to dodge GitHub's top-of-hour cron congestion.
+  schedule:
+    - cron: "17 6 * * *"
 
 # Allow the deploy job to publish to Pages and verify the deployment.
 permissions:
