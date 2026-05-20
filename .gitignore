@@ -52,3 +52,6 @@ next-env.d.ts
 
 # claude code per-machine permission state
 .claude/settings.local.json
+
+# playwright MCP session artifacts (snapshots, logs) — never commit
+/.playwright-mcp/
