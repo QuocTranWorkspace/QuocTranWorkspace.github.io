@@ -298,11 +298,14 @@ export function Mnemo() {
             makes Claude Code remember what you&rsquo;ve already taught it.
           </h2>
           <p className="text-ink-mute text-lg max-w-2xl text-balance">
-            Local-first daemon on 127.0.0.1:7373. Hybrid Graph-RAG, six-term
-            scoring, sentence-transformers MiniLM embeddings, SQLite + sqlite-vec
-            store. Ships a versioned protocol, a VS Code extension, and
-            provider-shim middleware for OpenAI / Anthropic / Google / Ollama —
-            and keeps shipping (version above is live from GitHub).
+            All the lessons you teach an AI coding assistant — your team&rsquo;s
+            patterns, your design decisions, the gotchas you keep re-learning —
+            collected into a small searchable graph on your own laptop. mnemo
+            picks the most relevant pieces every time you ask the AI a
+            question, and feeds them in automatically, with citations,
+            capped at a small budget so it never floods the conversation.
+            Open source, runs offline, shipping new releases continuously
+            (the version above is live from GitHub).
           </p>
         </header>
 

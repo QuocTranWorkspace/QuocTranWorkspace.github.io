@@ -1,0 +1,239 @@
+- generic [ref=e3]:
+  - navigation [ref=e49]:
+    - link "Keanu Logo" [ref=e50] [cursor=pointer]:
+      - /url: /
+      - img "Keanu Logo" [ref=e51]
+    - generic [ref=e52]:
+      - link "Residences" [ref=e53] [cursor=pointer]:
+        - /url: /
+      - link "Masterplan" [ref=e54] [cursor=pointer]:
+        - /url: /masterplan
+      - link "Explore" [ref=e55] [cursor=pointer]:
+        - /url: /about
+      - link "Shortlist" [ref=e56] [cursor=pointer]:
+        - /url: /shortlist
+      - button "Enquire" [ref=e57]
+      - button "User profile" [ref=e60]:
+        - generic [ref=e61]: SA
+  - main [ref=e4]:
+    - generic [ref=e62]:
+      - generic [ref=e66]:
+        - generic [ref=e67]: Loading countdown...
+        - img "Keanu Residences Logo" [ref=e68]
+        - heading "A PRIVATE BEACHFRONT ESTATE" [level=2] [ref=e69]
+        - paragraph [ref=e70]:
+          - generic [ref=e71]: A limited collection of 10 beachfront residences within a private gated estate on Bali’s sunrise coast. Designed for privacy, proportion, and long-term residential living
+        - link "Explore Residences" [ref=e72] [cursor=pointer]:
+          - /url: "#available-villas"
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - heading "Available Residences" [level=2] [ref=e76]
+          - paragraph [ref=e77]: Private Introduction
+        - generic [ref=e78]:
+          - button "ALL" [ref=e79]
+          - button "Type I" [ref=e80]
+          - button "Type II" [ref=e81]
+          - button "Type III" [ref=e82]
+          - button "Type IV" [ref=e83]
+      - generic [ref=e92]:
+        - generic [ref=e93]:
+          - generic [ref=e94]: The Masterplan
+          - heading "Explore the Estate, Residence by Residence" [level=2] [ref=e95]:
+            - text: Explore the Estate,
+            - text: Residence by Residence
+          - paragraph [ref=e96]: A live, interactive view of Keanu's ten residences. Move through the estate, understand each residence's orientation, outlook, and begin to identify the position that feels right.
+        - generic [ref=e99]:
+          - generic:
+            - generic: Loading masterplan…
+          - iframe [ref=e100]:
+            - main [ref=f4e2]:
+              - generic [ref=f4e4]:
+                - generic:
+                  - img "Aerial background" [ref=f4e5]
+                  - img
+                - button "Residence 1" [ref=f4e27]: "1"
+                - generic [ref=f4e28]:
+                  - generic [ref=f4e29]:
+                    - paragraph [ref=f4e30]: Type II
+                    - paragraph [ref=f4e31]: 2 Storey + rooftop
+                    - paragraph [ref=f4e32]: 3 BR
+                    - generic [ref=f4e33]:
+                      - paragraph [ref=f4e34]: "Land area: 550 m²"
+                      - paragraph [ref=f4e35]: "Interior area: 379 m²"
+                  - generic [ref=f4e36]: Residence1
+                - button "Residence 2" [ref=f4e38]: "2"
+                - generic [ref=f4e39]:
+                  - generic [ref=f4e40]:
+                    - paragraph [ref=f4e41]: Type II
+                    - paragraph [ref=f4e42]: 2 Storey + rooftop
+                    - paragraph [ref=f4e43]: 3 BR + guest suite
+                    - generic [ref=f4e44]:
+                      - paragraph [ref=f4e45]: "Land area: 670 m²"
+                      - paragraph [ref=f4e46]: "Interior area: 448 m²"
+                  - generic [ref=f4e47]: Residence2
+                - button "Residence 3" [ref=f4e49]: "3"
+                - generic [ref=f4e50]:
+                  - generic [ref=f4e51]:
+                    - paragraph [ref=f4e52]: Type I
+                    - paragraph [ref=f4e53]: 2 Storey + rooftop
+                    - paragraph [ref=f4e54]: 3 BR + guest suite
+                    - generic [ref=f4e55]:
+                      - paragraph [ref=f4e56]: "Land area: 665 m²"
+                      - paragraph [ref=f4e57]: "Interior area: 448 m²"
+                  - generic [ref=f4e58]: Residence3
+                - button "Residence 4" [ref=f4e60]: "4"
+                - generic [ref=f4e61]:
+                  - generic [ref=f4e62]:
+                    - paragraph [ref=f4e63]: Type III
+                    - paragraph [ref=f4e64]: 1 Storey
+                    - paragraph [ref=f4e65]: 3 BR + guest suite
+                    - generic [ref=f4e66]:
+                      - paragraph [ref=f4e67]: "Land area: 960 m²"
+                      - paragraph [ref=f4e68]: "Interior area: 286 m²"
+                  - generic [ref=f4e69]: Residence4
+                - button "Residence 5" [ref=f4e71]: "5"
+                - generic [ref=f4e72]:
+                  - generic [ref=f4e73]:
+                    - paragraph [ref=f4e74]: Type IV
+                    - paragraph [ref=f4e75]: 2 Storey + rooftop
+                    - paragraph [ref=f4e76]: 6 BR + guest suite
+                    - generic [ref=f4e77]:
+                      - paragraph [ref=f4e78]: "Land area: 880 m²"
+                      - paragraph [ref=f4e79]: "Interior area: 540 m²"
+                  - generic [ref=f4e80]: Residence5
+                - button "Residence 6" [ref=f4e82]: "6"
+                - generic [ref=f4e83]:
+                  - generic [ref=f4e84]:
+                    - paragraph [ref=f4e85]: Type I
+                    - paragraph [ref=f4e86]: 2 Storey + rooftop
+                    - paragraph [ref=f4e87]: 3 BR + guest suite
+                    - generic [ref=f4e88]:
+                      - paragraph [ref=f4e89]: "Land area: 770 m²"
+                      - paragraph [ref=f4e90]: "Interior area: 448 m²"
+                  - generic [ref=f4e91]: Residence6
+                - button "Residence 7" [ref=f4e93]: "7"
+                - generic [ref=f4e94]:
+                  - generic [ref=f4e95]:
+                    - paragraph [ref=f4e96]: Type I
+                    - paragraph [ref=f4e97]: 2 Storey + rooftop
+                    - paragraph [ref=f4e98]: 3 BR + guest suite
+                    - generic [ref=f4e99]:
+                      - paragraph [ref=f4e100]: "Land area: 810 m²"
+                      - paragraph [ref=f4e101]: "Interior area: 448 m²"
+                  - generic [ref=f4e102]: Residence7
+                - button "Residence 8" [ref=f4e104]: "8"
+                - generic [ref=f4e105]:
+                  - generic [ref=f4e106]:
+                    - paragraph [ref=f4e107]: Type III
+                    - paragraph [ref=f4e108]: 1 Storey
+                    - paragraph [ref=f4e109]: 3 BR + guest suite
+                    - generic [ref=f4e110]:
+                      - paragraph [ref=f4e111]: "Land area: 1060 m²"
+                      - paragraph [ref=f4e112]: "Interior area: 321 m²"
+                  - generic [ref=f4e113]: Residence8
+                - button "Residence 9" [ref=f4e115]: "9"
+                - generic [ref=f4e116]:
+                  - generic [ref=f4e117]:
+                    - paragraph [ref=f4e118]: Type II
+                    - paragraph [ref=f4e119]: 2 Storey + rooftop
+                    - paragraph [ref=f4e120]: 3 BR
+                    - generic [ref=f4e121]:
+                      - paragraph [ref=f4e122]: "Land area: 440 m²"
+                      - paragraph [ref=f4e123]: "Interior area: 379 m²"
+                  - generic [ref=f4e124]: Residence9
+                - button "Residence 10" [ref=f4e126]: "10"
+                - generic [ref=f4e127]:
+                  - generic [ref=f4e128]:
+                    - paragraph [ref=f4e129]: Type III
+                    - paragraph [ref=f4e130]: 1 Storey
+                    - paragraph [ref=f4e131]: 3 BR + guest suite
+                    - generic [ref=f4e132]:
+                      - paragraph [ref=f4e133]: "Land area: 800 m²"
+                      - paragraph [ref=f4e134]: "Interior area: 293 m²"
+                  - generic [ref=f4e135]: Residence10
+                - generic [ref=f4e136]: "Residents` Pavilion"
+                - generic [ref=f4e137]: Estate Entry
+              - img "Keanu Residences" [ref=f4e139]
+        - generic [ref=e101]:
+          - link "View Interactive Masterplan" [ref=e102] [cursor=pointer]:
+            - /url: /masterplan
+          - link "Request Private Review →" [ref=e103] [cursor=pointer]:
+            - /url: https://wa.me/6281190010008
+      - generic [ref=e105]:
+        - generic [ref=e106]:
+          - generic [ref=e107]: Release Value Pathway
+          - heading "Early Access, Stronger Position" [level=2] [ref=e108]:
+            - text: Early Access,
+            - text: Stronger Position
+          - paragraph [ref=e109]: Indicative pricing and value stages are shown for selected residences. Final pricing, assumptions, and availability confirmed privately.
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - combobox "Residence type" [ref=e112] [cursor=pointer]:
+              - option "Type I - 4 Bedroom" [selected]
+              - option "Type II - 3 Bedroom"
+              - option "Type III - 4 Bedroom"
+              - option "Type IV - 7 Bedroom"
+            - combobox "Unit" [ref=e113] [cursor=pointer]:
+              - option "Residence Two" [selected]
+              - option "Residence Three"
+              - option "Residence Six"
+              - option "Residence Seven"
+          - generic [ref=e114]:
+            - generic [ref=e115]: Currency
+            - combobox "Currency" [ref=e116] [cursor=pointer]:
+              - option "IDR" [selected]
+              - option "USD"
+              - option "AUD"
+              - option "HKD"
+              - option "SGD"
+              - option "AED"
+              - option "EUR"
+              - option "KRW"
+              - option "CNY"
+        - generic [ref=e119]:
+          - generic [ref=e120] [cursor=pointer]:
+            - generic [ref=e124]:
+              - generic [ref=e125]: 100%
+              - generic [ref=e126]: Opening Release
+            - generic:
+              - generic: Opening Price
+              - generic: IDR 42.121B
+              - paragraph: Initial release pricing for selected residences.
+          - generic [ref=e130] [cursor=pointer]:
+            - generic [ref=e131]: 105%
+            - generic [ref=e132]: Post-Opening
+          - generic [ref=e136] [cursor=pointer]:
+            - generic [ref=e137]: 110%
+            - generic [ref=e138]: Structural Completion
+          - generic [ref=e142] [cursor=pointer]:
+            - generic [ref=e143]: 115%
+            - generic [ref=e144]: Handover
+          - generic [ref=e148] [cursor=pointer]:
+            - generic [ref=e149]: 142%
+            - generic [ref=e150]: 2030 Estimation
+        - link "Reserve at Current Price" [ref=e152] [cursor=pointer]:
+          - /url: https://wa.me/6281190010008
+  - contentinfo [ref=e153]:
+    - generic [ref=e154]:
+      - link "Keanu Logo" [ref=e156] [cursor=pointer]:
+        - /url: /
+        - img "Keanu Logo" [ref=e157]
+      - generic [ref=e158]:
+        - generic [ref=e159]:
+          - heading "Residences" [level=4] [ref=e160]
+          - generic [ref=e161]:
+            - link "Overview" [ref=e162] [cursor=pointer]:
+              - /url: /
+            - link "Masterplan" [ref=e163] [cursor=pointer]:
+              - /url: /masterplan
+        - generic [ref=e164]:
+          - heading "Residences" [level=4] [ref=e165]
+          - generic [ref=e166]:
+            - link "Available Residences" [ref=e167] [cursor=pointer]:
+              - /url: /#available-villas
+            - link "Explore" [ref=e168] [cursor=pointer]:
+              - /url: /about
+    - generic [ref=e169]:
+      - paragraph [ref=e170]: © 2026 KEANU RESIDENCES. ALL RIGHTS RESERVED.
+      - link "TERMS & PRIVACY POLICY" [ref=e172] [cursor=pointer]:
+        - /url: /privacy

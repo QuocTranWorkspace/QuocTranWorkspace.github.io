@@ -1,0 +1,151 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - link "PA AIVision PA AIVision" [ref=e6] [cursor=pointer]:
+        - /url: /dashboard
+        - img "PA AIVision" [ref=e8]
+        - generic [ref=e9]: PA AIVision
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - img "organization logo" [ref=e13]
+          - generic [ref=e14]:
+            - paragraph [ref=e15]: Tổ chức
+            - paragraph [ref=e16]: PA
+        - generic [ref=e17]:
+          - generic [ref=e18]: Quản Trị Công Ty
+          - button "Mở không gian làm việc" [ref=e19]:
+            - img [ref=e20]
+      - navigation [ref=e23]:
+        - link "Bảng điều khiển" [ref=e25] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e26]
+          - text: Bảng điều khiển
+        - generic [ref=e31]:
+          - button "Vận hành" [expanded] [ref=e32]:
+            - img [ref=e33]
+            - generic [ref=e35]: Vận hành
+          - link "Cảnh báo" [ref=e36] [cursor=pointer]:
+            - /url: /alerts
+            - img [ref=e37]
+            - text: Cảnh báo
+          - link "Báo cáo" [ref=e40] [cursor=pointer]:
+            - /url: /reports
+            - img [ref=e41]
+            - text: Báo cáo
+          - link "Sự cố & SLA" [ref=e44] [cursor=pointer]:
+            - /url: /incidents
+            - img [ref=e45]
+            - text: Sự cố & SLA
+          - link "Kho lưu trữ" [ref=e47] [cursor=pointer]:
+            - /url: /archive
+            - img [ref=e48]
+            - text: Kho lưu trữ
+        - generic [ref=e52]:
+          - button "Hạ tầng" [expanded] [ref=e53]:
+            - img [ref=e54]
+            - generic [ref=e56]: Hạ tầng
+          - link "Camera" [ref=e57] [cursor=pointer]:
+            - /url: /cameras
+            - img [ref=e58]
+            - text: Camera
+          - link "Quản lý AIBox" [ref=e61] [cursor=pointer]:
+            - /url: /onboarding
+            - img [ref=e62]
+            - text: Quản lý AIBox
+          - link "Mô hình AI" [ref=e65] [cursor=pointer]:
+            - /url: /ai-model
+            - img [ref=e66]
+            - text: Mô hình AI
+        - generic [ref=e69]:
+          - button "Tổ chức" [expanded] [ref=e70]:
+            - img [ref=e71]
+            - generic [ref=e73]: Tổ chức
+          - link "Tổ chức" [ref=e74] [cursor=pointer]:
+            - /url: /organizations
+            - img [ref=e75]
+            - text: Tổ chức
+          - link "Thành viên" [ref=e79] [cursor=pointer]:
+            - /url: /members
+            - img [ref=e80]
+            - text: Thành viên
+          - link "Yêu cầu tham gia" [ref=e85] [cursor=pointer]:
+            - /url: /join-requests
+            - img [ref=e86]
+            - text: Yêu cầu tham gia
+          - link "Phân quyền" [ref=e89] [cursor=pointer]:
+            - /url: /permissions
+            - img [ref=e90]
+            - text: Phân quyền
+        - generic [ref=e93]:
+          - button "Hệ thống" [expanded] [ref=e94]:
+            - img [ref=e95]
+            - generic [ref=e97]: Hệ thống
+          - link "Giấy phép" [ref=e98] [cursor=pointer]:
+            - /url: /license
+            - img [ref=e99]
+            - text: Giấy phép
+          - link "Phiên đăng nhập" [ref=e102] [cursor=pointer]:
+            - /url: /sessions
+            - img [ref=e103]
+            - text: Phiên đăng nhập
+          - link "Cài đặt" [ref=e106] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e107]
+            - text: Cài đặt
+    - generic [ref=e110]:
+      - banner [ref=e111]:
+        - heading "Quản lý AIBox" [level=1] [ref=e114]
+        - generic [ref=e115]:
+          - button "Thông báo, 7 chưa đọc" [ref=e117]:
+            - img [ref=e118]
+            - generic: "7"
+          - button "PA PA Admin Quản Trị Công Ty" [ref=e122]:
+            - generic [ref=e123]: PA
+            - generic [ref=e124]:
+              - paragraph [ref=e125]: PA Admin
+              - paragraph [ref=e126]: Quản Trị Công Ty
+            - img [ref=e127]
+      - main [ref=e129]:
+        - generic [ref=e130]:
+          - generic [ref=e133]:
+            - generic [ref=e134]:
+              - img [ref=e135]
+              - text: Theo dõi AIBox và đăng ký thiết bị
+            - heading "Danh mục AIBox & Hàng đợi đăng ký" [level=1] [ref=e138]
+            - paragraph [ref=e139]: Xem AIBox đã kích hoạt, mở chi tiết, vào màn hình camera hoặc quản lý hàng đợi đăng ký.
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - generic [ref=e142]:
+                - paragraph [ref=e143]: Tổng AIBox hiển thị
+                - paragraph [ref=e144]: "1"
+                - paragraph [ref=e145]: Thiết bị bạn có thể truy cập
+              - generic [ref=e146]:
+                - paragraph [ref=e147]: Đang hoạt động
+                - paragraph [ref=e148]: "1"
+                - paragraph [ref=e149]: Số AIBox đang hoạt động
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: Tổng chi nhánh đã đăng ký AIBox
+                - paragraph [ref=e152]: "1"
+                - paragraph [ref=e153]: Số lượng chi nhánh đã được gán AIBox
+            - generic [ref=e154]:
+              - generic [ref=e156]:
+                - img [ref=e157]
+                - textbox [ref=e160]:
+                  - /placeholder: Tìm theo tên hoặc serial AIBox
+              - button "Xem camera cho AIBOX Noi Bai" [ref=e162] [cursor=pointer]:
+                - generic [ref=e163]:
+                  - generic [ref=e164]:
+                    - heading "AIBOX Noi Bai" [level=3] [ref=e165]
+                    - generic [ref=e166]: Trực tuyến
+                  - generic [ref=e167]:
+                    - paragraph [ref=e168]: "Số serial: AIB-PA-NOIBAI-001"
+                    - paragraph [ref=e169]: "Chi nhánh: Nội Bài"
+                    - paragraph [ref=e170]: "Mẫu thiết bị: —"
+                    - paragraph [ref=e171]: "Phiên bản firmware: v1.0.0"
+                    - paragraph [ref=e172]: "Camera: 15"
+                    - paragraph [ref=e173]: "Cảm biến: 0"
+                    - paragraph [ref=e174]: "Lần cuối trực tuyến: 20/05/2026 21:17:01"
+                - generic [ref=e175]:
+                  - button "Chi tiết" [ref=e176]
+                  - button "Xem camera" [ref=e177]
+  - region "Notifications alt+T"

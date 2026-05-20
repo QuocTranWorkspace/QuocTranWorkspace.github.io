@@ -1,0 +1,4 @@
+[    1577ms] [LOG] [CURRENCY] Connected to socket /currency @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    1598ms] [LOG] [FRONTEND] Currency rates updated via WebSocket at 9:18:34 PM {IDR: 17713.43819, EUR: 0.861198, JPY: 159.031908, GBP: 0.746281, AUD: 1.406183} @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    1815ms] [LOG] Connected to socket /reservations @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    6626ms] [LOG] [FRONTEND] Currency rates updated via WebSocket at 9:18:39 PM {IDR: 17713.43819, EUR: 0.861198, JPY: 159.031908, GBP: 0.746281, AUD: 1.406183} @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59

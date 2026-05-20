@@ -74,17 +74,18 @@ export function AIBoxCloseup() {
             Edge AI live at Noi Bai airport and a 110 kV substation.
           </motion.h2>
           <motion.p variants={headerItem} className="text-ink-mute text-lg max-w-2xl">
-            Shipped to{" "}
+            Live at{" "}
             <span className="text-ink">Petrolimex Aviation at Noi Bai International Airport</span>{" "}
-            and{" "}
-            <span className="text-ink">EVN&rsquo;s 110 kV Mo Lao substation</span>. One
-            Jetson box per site, four RTSP cameras, real-time bounding boxes
-            streamed back to the cloud over WebRTC. WebSocket events, MJPEG
-            fallback, PostgreSQL + pgvector for the analytics tail.
+            and at{" "}
+            <span className="text-ink">EVN&rsquo;s 110 kV Mo Lao substation</span>.
+            One rugged box per site watches four cameras at once, spots safety
+            violations the instant they happen, and pushes alerts to the cloud
+            in under a second. No video ever leaves the site for AI — the
+            inference runs right there on the device.
           </motion.p>
         </motion.header>
 
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-stretch">
           {/* Stats column */}
           <motion.div
             initial="hidden"
@@ -171,7 +172,7 @@ function DetectionFrame({ scrollYProgress }: DetectionFrameProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={viewportOpts}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-      className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border rule bg-bg-elev"
+      className="relative aspect-[16/9] min-h-[20rem] w-full overflow-hidden rounded-2xl border rule bg-bg-elev lg:aspect-auto lg:h-full"
     >
       <Image
         src="/media/aibox-noibai-001.jpg"

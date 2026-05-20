@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { WorkEntry } from "@/content/work";
 import { cn } from "@/lib/utils";
@@ -143,6 +144,56 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           ))}
         </ol>
       </motion.section>
+
+      {entry.images && entry.images.length > 0 ? (
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOpts}
+          variants={container}
+          className="mt-16 grid gap-10 lg:grid-cols-[1fr_2fr]"
+        >
+          <motion.h2
+            variants={item}
+            className="font-mono text-xs uppercase tracking-[0.3em] text-ink-mute"
+          >
+            From the live product
+          </motion.h2>
+          <ul className="grid gap-6 sm:grid-cols-2">
+            {entry.images.map((img, i) => (
+              <motion.li
+                key={img.src}
+                variants={item}
+                className={cn(
+                  // First image in a two-column gallery spans both columns
+                  // on sm+ for a stronger hero effect.
+                  "overflow-hidden rounded-2xl border rule bg-bg-elev/40",
+                  i === 0 && entry.images!.length > 1 && "sm:col-span-2",
+                )}
+              >
+                <div className="relative aspect-[16/9] w-full">
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    sizes={
+                      i === 0
+                        ? "(min-width: 1024px) 66vw, 100vw"
+                        : "(min-width: 1024px) 33vw, 50vw"
+                    }
+                    className="object-cover"
+                  />
+                </div>
+                {img.caption ? (
+                  <p className="px-4 py-3 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
+                    {img.caption}
+                  </p>
+                ) : null}
+              </motion.li>
+            ))}
+          </ul>
+        </motion.section>
+      ) : null}
 
       <motion.section
         initial="hidden"

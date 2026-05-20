@@ -1,0 +1,4 @@
+[    1305ms] [LOG] [CURRENCY] Connected to socket /currency @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    1306ms] [LOG] [FRONTEND] Currency rates updated via WebSocket at 9:19:13 PM {IDR: 17713.43819, EUR: 0.861198, JPY: 159.031908, GBP: 0.746281, AUD: 1.406183} @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    1530ms] [LOG] Connected to socket /reservations @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    4776ms] [WARNING] The resource https://brio-keanu.vercel.app/_next/image?url=%2Faerial.png&w=640&q=75 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://brio-keanu.vercel.app/:0

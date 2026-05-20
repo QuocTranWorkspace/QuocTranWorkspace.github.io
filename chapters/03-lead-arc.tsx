@@ -17,47 +17,47 @@ type Tile = {
 
 const tiles: Tile[] = [
   {
-    slug: "aibox",
-    name: "AIBox",
-    tagline:
-      "Production multi-camera surveillance on NVIDIA Jetson — 10+ YOLO models (helmet / oil-spill / smoke / plate / face), real-time WebRTC/RTSP/MJPEG, 50+ REST endpoints across 9 routers.",
-    stack: ["FastAPI", "PyTorch", "Ultralytics YOLO", "pgvector", "FaceNet", "Jetson"],
-    span: "wide",
-  },
-  {
     slug: "aicloud",
     name: "AICloud",
     tagline:
-      "Multi-tenant SaaS to manage AIBox fleets. Web dashboard + companion mobile app, RBAC across four roles, automated Ubuntu deploys, full DB seeding pipeline.",
+      "The cloud dashboard that manages every AIBox in the field. Web app plus companion mobile app, role-based access, automated server deploys, alerts and event timeline across the fleet.",
     stack: ["NestJS", "Prisma", "React 19", "React Native"],
+    span: "wide",
+  },
+  {
+    slug: "aibox",
+    name: "AIBox",
+    tagline:
+      "The edge box itself — one rugged NVIDIA Jetson per site, four CCTV cameras, real-time safety detections (helmet, oil-spill, smoke, plate, face) streamed back to the cloud in under a second.",
+    stack: ["FastAPI", "PyTorch", "Ultralytics YOLO", "pgvector", "Jetson"],
   },
   {
     slug: "unlimit",
     name: "Unlimit",
     tagline:
-      "Multi-tenant WhatsApp integration platform. Express + Sequelize backend with a separate worker, Bull queues on Redis, granular permissions matrix, MinIO + Mailhog dev stack.",
+      "WhatsApp at agency scale. Many phones, many brands, many agents — one inbox plugged straight into the customer's CRM. Multi-tenant under the hood; one click for the operator.",
     stack: ["Node.js", "Express", "Sequelize", "Redis", "Bull", "React 19", "TanStack"],
   },
   {
     slug: "swisslife",
     name: "Swisslife",
     tagline:
-      "Microservices platform behind a Kong gateway: auth, config, envoi, recipient, audit, email. NATS JetStream messaging, full observability stack, Postgres + ElasticSearch + MinIO storage.",
-    stack: ["Microservices", "Kong", "NATS JetStream", "Postgres", "ElasticSearch", "Jaeger", "Prometheus"],
+      "Bulk document dispatch for an insurance workflow. Ten services hand off via an event bus to send personal letters, verify identity with a one-time code, and keep an audit trail that compliance can actually open in Excel.",
+    stack: ["Microservices", "Kong", "NATS JetStream", "Postgres", "Mongo", "Twilio", "Grafana"],
     span: "tall",
   },
   {
     slug: "keanu",
-    name: "Keanu",
+    name: "Keanu Residences",
     tagline:
-      "Reservation / booking system with a Gemini-powered intelligence layer. React 19 + Vite frontend, NestJS backend with a dedicated reservations module.",
-    stack: ["React 19", "Vite", "NestJS", "Gemini"],
+      "Reservation platform for a luxury villa launch in Bali. Buyers browse, shortlist, lock a unit, and pay a deposit — atomic Redis locking guarantees one buyer per villa even when twenty refresh at once.",
+    stack: ["NestJS", "Prisma", "Postgres", "Redis", "Stripe", "Socket.io", "React 19"],
   },
   {
     slug: "ham-cap",
     name: "ham-cap",
     tagline:
-      "AIBox sibling for sensor-data deployments. NestJS cloud backend, Postgres + MinIO, automated Ubuntu provisioning script, Docker Compose stack.",
+      "The sensor-data cousin of AIBox. Same idea — one edge box per site — but built around environmental sensors instead of cameras. One-script Ubuntu install so a field technician can stand up a new site.",
     stack: ["NestJS", "Postgres", "MinIO", "Docker Compose"],
   },
 ];
@@ -129,8 +129,9 @@ export function LeadArc() {
           Six months in, I was leading the AI + cloud workstreams.
         </motion.h2>
         <motion.p variants={headerItem} className="text-ink-mute text-lg max-w-2xl">
-          Promoted to Technical Lead in December. I own architecture, code
-          review, roadmap, and on-call rituals across the surfaces below.
+          Promoted to Technical Lead in December. Each tile below is a real
+          product running in production today — tap any of them for the full
+          story, the live screenshots, and the lessons learned.
         </motion.p>
       </motion.header>
 

@@ -72,8 +72,11 @@ export function Crossover() {
           variants={stageItem}
           className="text-ink-mute text-lg max-w-2xl text-balance"
         >
-          NestJS, TypeORM, Knex, JWT, GitLab CI. The platform ran videos through
-          five asynchronous stages before they ever reached a human editor.
+          The platform ran a YouTube channel&rsquo;s next video through five
+          automated stages — research, ideation, scripting, storyboard,
+          finishing — before a human editor ever opened it. My job was the
+          backend pipeline that orchestrated it, the security around access,
+          and the deploy pipeline that took it from laptop to staging.
         </motion.p>
       </motion.header>
 

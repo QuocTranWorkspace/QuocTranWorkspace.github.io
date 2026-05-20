@@ -27,8 +27,9 @@ export function ColdOpen() {
 
         <FadeUp delay={0.9}>
           <p className="text-ink-mute text-lg max-w-xl text-balance">
-            Full-Stack Engineer · Technical Lead. Edge AI on Jetson, Go on
-            Kubernetes, local-first developer tooling. Hanoi, Vietnam.
+            Full-Stack Engineer · Technical Lead. AI cameras at airports,
+            cloud platforms that scale, and tools that help small teams ship
+            big things. Based in Hanoi.
           </p>
         </FadeUp>
 

@@ -1,0 +1,5 @@
+[     510ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://keanu-backend-production.up.railway.app/api/auth/me:0
+[     893ms] [LOG] [CURRENCY] Connected to socket /currency @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[     893ms] [LOG] [FRONTEND] Currency rates updated via WebSocket at 9:19:29 PM {IDR: 17713.43819, EUR: 0.861198, JPY: 159.031908, GBP: 0.746281, AUD: 1.406183} @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    1119ms] [LOG] Connected to socket /reservations @ https://sales.keanubali.com/assets/index-CaH33O6k.js:59
+[    1360ms] [WARNING] No routes matched location "/admin/dashboard"  @ https://sales.keanubali.com/assets/index-CaH33O6k.js:57
