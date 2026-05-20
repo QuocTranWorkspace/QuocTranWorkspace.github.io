@@ -69,22 +69,22 @@ export const works: Record<string, WorkEntry> = {
     ],
     images: [
       {
-        src: "/work/aicloud/dashboard.png",
+        src: "/work/aicloud/dashboard.jpg",
         alt: "AICloud dashboard — live map of every camera, KPI cards for today's events, recent alerts feed.",
         caption: "Dashboard — every site at a glance.",
       },
       {
-        src: "/work/aicloud/cameras.png",
+        src: "/work/aicloud/cameras.jpg",
         alt: "Camera grid view showing the latest AI-annotated frame per camera with status indicators.",
         caption: "Cameras — latest AI-annotated frame per stream.",
       },
       {
-        src: "/work/aicloud/ai-models.png",
+        src: "/work/aicloud/ai-models.jpg",
         alt: "AI models catalog — list of running detection models with camera counts and versions.",
         caption: "AI models — the catalog of what's running where.",
       },
       {
-        src: "/work/aicloud/aibox-management.png",
+        src: "/work/aicloud/aibox-management.jpg",
         alt: "AIBox onboarding queue showing edge devices awaiting approval.",
         caption: "AIBox onboarding — new edge devices come in here.",
       },
@@ -132,7 +132,7 @@ export const works: Record<string, WorkEntry> = {
     ],
     images: [
       {
-        src: "/work/aibox/alerts-feed.png",
+        src: "/work/aibox/alerts-feed.jpg",
         alt: "Live alerts feed from AIBox — annotated photos of detected safety violations.",
         caption: "Alerts feed — every detection arrives with a photo, a video clip, and an assessment workflow.",
       },
@@ -184,17 +184,17 @@ export const works: Record<string, WorkEntry> = {
     ],
     images: [
       {
-        src: "/work/unlimit/apps.png",
+        src: "/work/unlimit/apps.jpg",
         alt: "Unlimit organization apps page — list of brands / sub-clients an agency manages.",
         caption: "Apps — each one is a separate brand, with its own WhatsApp devices and routing.",
       },
       {
-        src: "/work/unlimit/agencies.png",
+        src: "/work/unlimit/agencies.jpg",
         alt: "Agencies list view (super-admin scope).",
         caption: "Agencies — the agency-of-agencies view for platform admins.",
       },
       {
-        src: "/work/unlimit/ghl-connections.png",
+        src: "/work/unlimit/ghl-connections.jpg",
         alt: "GoHighLevel CRM connections page — manage the OAuth links between Unlimit and a customer's CRM.",
         caption: "GHL connections — every agency plugs into their own GoHighLevel here.",
       },
@@ -243,17 +243,17 @@ export const works: Record<string, WorkEntry> = {
     ],
     images: [
       {
-        src: "/work/keanu/residences.png",
+        src: "/work/keanu/residences.jpg",
         alt: "Keanu Residences buyer landing page — luxury villa gallery and brand surface.",
         caption: "Buyer landing — the surface every prospect lands on at launch.",
       },
       {
-        src: "/work/keanu/masterplan.png",
+        src: "/work/keanu/masterplan.jpg",
         alt: "Interactive masterplan — see every villa on the site and their availability status.",
         caption: "Interactive masterplan — live availability updates push from server to client.",
       },
       {
-        src: "/work/keanu/admin-villas.png",
+        src: "/work/keanu/admin-villas.jpg",
         alt: "Admin villa management — control unit availability, pricing, and launch timing.",
         caption: "Admin villas — control unit availability, pricing, and launch state.",
       },

@@ -1,63 +1,83 @@
 "use client";
 
 import { useEffect } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/lib/lenis";
 import { consumeHomeScroll } from "@/lib/scroll-memory";
 
 /**
- * Restores scroll position on the home page when the user comes back from a
- * /work deep dive.
+ * Restores scroll position when the user comes back from a /work deep dive.
  *
- * Priority:
- *   1. A saved exact position (set on tile click) — restore precisely.
- *   2. A URL hash (#chapter-N) — scroll to that chapter (covers direct
- *      visitors who used the "Back to portfolio" link).
- *   3. Nothing — leave the page at the top so the cinematic intro plays.
+ * Why this is tricky:
+ *   1. Chapter 01's horizontal scrub creates a ScrollTrigger pin spacer
+ *      AFTER mount, which changes the page's total height and every
+ *      subsequent chapter's offsetTop.
+ *   2. Lenis boots on a separate useEffect, so lenis.scrollTo isn't
+ *      reliable for the first few frames.
  *
- * GSAP ScrollTrigger pins (chapter 1) inject a spacer that changes total
- * page height after first paint, so we re-apply the target a couple of
- * times across rAF + a short timeout until layout settles.
+ * Strategy:
+ *   - Hide <html> immediately if we have something to restore. No
+ *     "wrong chapter then correct chapter" flicker is ever visible.
+ *   - Save target as { chapter, offset within } rather than raw scrollY,
+ *     so it tracks layout shifts caused by the pin spacer.
+ *   - Listen for ScrollTrigger's `refresh` event — fires once the pin
+ *     spacer is created and offsetTop is final.
+ *   - Apply on first refresh, then reveal next frame.
+ *   - Safety nets: a 500 ms force-apply (in case ScrollTrigger never
+ *     refreshes) and a 1500 ms hard-reveal (never block the page for
+ *     more than 1.5 s).
  */
 export function ScrollRestoration() {
   useEffect(() => {
-    const savedY = consumeHomeScroll();
+    const saved = consumeHomeScroll();
     const hash = window.location.hash;
 
-    if (savedY === null && !hash) return;
+    if (!saved && !hash) return;
 
-    let cancelled = false;
+    const html = document.documentElement;
+    html.style.visibility = "hidden";
 
-    const apply = () => {
-      if (cancelled) return;
-      const lenis = getLenis();
+    let restored = false;
 
-      if (savedY !== null) {
-        if (lenis) lenis.scrollTo(savedY, { immediate: true });
-        else window.scrollTo(0, savedY);
-        return;
+    const resolveTarget = (): number | null => {
+      if (saved) {
+        const el = document.getElementById(saved.chapter);
+        if (!el) return null;
+        return el.offsetTop + saved.offset;
       }
-
-      // Hash path — resolve the element and jump to its top.
-      const id = hash.replace(/^#/, "");
-      const el = id ? document.getElementById(id) : null;
-      if (!el) return;
-      if (lenis) lenis.scrollTo(el, { immediate: true });
-      else el.scrollIntoView();
+      if (hash) {
+        const el = document.getElementById(hash.slice(1));
+        if (!el) return null;
+        return el.offsetTop;
+      }
+      return null;
     };
 
-    // rAF×2 lets the first layout + ScrollTrigger.create pass complete;
-    // the timeouts re-apply after the pin spacer + fonts settle.
-    const raf1 = requestAnimationFrame(() =>
-      requestAnimationFrame(apply),
-    );
-    const t1 = setTimeout(apply, 250);
-    const t2 = setTimeout(apply, 600);
+    const apply = () => {
+      if (restored) return;
+      const target = resolveTarget();
+      if (target === null) return; // try again on the next tick
+      const lenis = getLenis();
+      if (lenis) lenis.scrollTo(target, { immediate: true });
+      else window.scrollTo(0, target);
+      restored = true;
+      requestAnimationFrame(() => {
+        html.style.visibility = "";
+      });
+    };
+
+    ScrollTrigger.addEventListener("refresh", apply);
+
+    const fallbackApply = setTimeout(apply, 500);
+    const hardReveal = setTimeout(() => {
+      html.style.visibility = "";
+    }, 1500);
 
     return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf1);
-      clearTimeout(t1);
-      clearTimeout(t2);
+      ScrollTrigger.removeEventListener("refresh", apply);
+      clearTimeout(fallbackApply);
+      clearTimeout(hardReveal);
+      html.style.visibility = "";
     };
   }, []);
 
