@@ -15,6 +15,21 @@ const chapters = [
   { id: "chapter-7", label: "Coda" },
 ];
 
+// Compute the active chapter directly from a scrollY — used as both the
+// initial seed (correct even after ScrollRestoration snaps the page) and a
+// belt-and-braces on every Lenis scroll tick so the dot never lies.
+function activeIndexFromScrollY(y: number): number {
+  // Active = the latest chapter whose offsetTop has crossed our reference
+  // line (35 % from the top of the viewport). Mirrors the IO threshold.
+  const line = y + window.innerHeight * 0.35;
+  let idx = 0;
+  for (let i = 0; i < chapters.length; i++) {
+    const el = document.getElementById(chapters[i]!.id);
+    if (el && el.offsetTop <= line) idx = i;
+  }
+  return idx;
+}
+
 export function SideDots() {
   const [active, setActive] = useState(0);
 
@@ -25,10 +40,24 @@ export function SideDots() {
 
     if (sections.length === 0) return;
 
-    // Active = whichever chapter currently intersects a 0-px-high horizontal
-    // line at 35% from the top of the viewport. This is robust for chapters
-    // taller than the viewport (chapter 3's bento can be > 1 screen on a
-    // narrow window) where a percentage-of-section threshold would fail.
+    // 1. Seed initial state from current scroll position. On return from a
+    //    /work deep dive, ScrollRestoration snaps the page to chapter 3
+    //    *before* the IntersectionObserver fires its initial callback —
+    //    relying on IO alone leaves the active dot stuck at chapter 0.
+    setActive(activeIndexFromScrollY(window.scrollY));
+
+    // 2. Listen to Lenis scroll events. Lenis is the source of truth while
+    //    smooth-scroll is active; native `scroll` events fire too, but
+    //    Lenis emits before/with them and is reliable on the snap.
+    const recompute = () =>
+      setActive(activeIndexFromScrollY(window.scrollY));
+    const lenis = getLenis();
+    lenis?.on("scroll", recompute);
+    window.addEventListener("scroll", recompute, { passive: true });
+
+    // 3. IntersectionObserver still catches in-page transitions cleanly for
+    //    chapters taller than the viewport where pure scrollY-vs-offsetTop
+    //    flips can stutter. Belt + braces.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -39,9 +68,13 @@ export function SideDots() {
       },
       { rootMargin: "-35% 0px -65% 0px", threshold: 0 },
     );
-
     sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
+
+    return () => {
+      observer.disconnect();
+      lenis?.off("scroll", recompute);
+      window.removeEventListener("scroll", recompute);
+    };
   }, []);
 
   const jumpTo = (id: string) => {

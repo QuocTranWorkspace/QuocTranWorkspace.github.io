@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
-import { Copy } from "lucide-react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { Check, Copy } from "lucide-react";
+import { useRef, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
 
@@ -31,11 +32,16 @@ const viewportOpts = { once: true, amount: 0.3 };
 
 export function Coda() {
   const toast = useToast();
+  const [copied, setCopied] = useState(false);
+  const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(EMAIL);
       toast.show("Email copied");
+      setCopied(true);
+      if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+      copyResetTimer.current = setTimeout(() => setCopied(false), 2200);
     } catch {
       // Clipboard API blocked (older browser, insecure context). Fall back
       // to the mailto: link — the anchor wrapper handles it.
@@ -90,21 +96,56 @@ export function Coda() {
               onClick={copyEmail}
               aria-label={`Copy email address ${EMAIL} to clipboard`}
               className={cn(
-                "group flex w-full flex-col gap-3 rounded-2xl border rule bg-bg-elev/60 px-6 py-6 text-left sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:px-8",
+                "group flex w-full flex-col gap-3 rounded-2xl border rule bg-bg-elev/60 px-6 py-6 text-left sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-8",
                 "transition-all hover:border-accent/60 hover:bg-bg-elev focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
               )}
             >
               <span className="shrink-0 font-mono text-xs uppercase tracking-widest text-ink-mute">
                 Email — tap to copy
               </span>
-              <span className="flex min-w-0 items-baseline gap-3">
+              <span className="flex min-w-0 items-center gap-3">
                 <span className="min-w-0 break-all font-display text-lg text-ink transition-colors group-hover:text-accent sm:text-2xl md:text-3xl">
                   {EMAIL}
                 </span>
-                <Copy
-                  className="size-4 shrink-0 self-center text-ink-mute transition-colors group-hover:text-accent"
+                {/* Swap Copy <-> Check on copy — a tiny rotate+scale crossfade
+                    so the affordance reads as a confirmed state, not just a
+                    silent toast. Resets after 2.2 s. */}
+                <span
                   aria-hidden
-                />
+                  className="relative inline-flex size-5 shrink-0 items-center justify-center"
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    {copied ? (
+                      <motion.span
+                        key="check"
+                        initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                        exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                        transition={{
+                          duration: 0.25,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className="absolute inset-0 inline-flex items-center justify-center text-accent"
+                      >
+                        <Check className="size-4" />
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="copy"
+                        initial={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                        exit={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                        transition={{
+                          duration: 0.25,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className="absolute inset-0 inline-flex items-center justify-center text-ink-mute transition-colors group-hover:text-accent"
+                      >
+                        <Copy className="size-4" />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </span>
               </span>
             </button>
           </motion.div>
