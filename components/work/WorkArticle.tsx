@@ -4,7 +4,9 @@ import { motion, type Variants } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useLayoutEffect } from "react";
 import type { WorkEntry } from "@/content/work";
+import { getLenis } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 
 const container: Variants = {
@@ -24,10 +26,20 @@ const item: Variants = {
 const viewportOpts = { once: true, amount: 0.25 };
 
 export function WorkArticle({ entry }: { entry: WorkEntry }) {
+  // Lenis is a singleton across pages — when navigating in from chapter 3
+  // at scrollY≈4500, the new /work page inherits that scroll and the user
+  // lands at the bottom. Force scroll to 0 before paint.
+  useLayoutEffect(() => {
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
+  }, []);
+
   return (
     <article className="container-edge py-16 lg:py-24">
       <Link
         href="/#chapter-3"
+        scroll={false}
         className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-mute transition-colors hover:text-accent"
       >
         <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
@@ -277,6 +289,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
       <footer className="mt-20 border-t rule pt-8">
         <Link
           href="/#chapter-3"
+          scroll={false}
           className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-mute transition-colors hover:text-accent"
         >
           <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />

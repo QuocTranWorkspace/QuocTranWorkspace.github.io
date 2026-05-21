@@ -65,6 +65,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={cn(fontVariables, "antialiased")}>
+      <head>
+        {/*
+          Pre-paint hide: when the user comes back from a /work deep dive
+          (sessionStorage has a saved scroll target), hide <html> SYNCHRONOUSLY
+          before the browser ever paints. The full ScrollRestoration logic
+          then runs in React, snaps to the right chapter after ScrollTrigger
+          settles, and reveals. Without this script the user briefly sees the
+          page at scrollY=0 (cold-open) before useEffect-scoped hiding kicks
+          in, which produces the "flick to chapter 2" effect.
+
+          A 1.2 s safety timeout reveals the page no matter what — even if
+          React fails to hydrate, the user never gets stuck on a blank page.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('byquoc:home-scroll')&&location.pathname==='/'){document.documentElement.style.visibility='hidden';setTimeout(function(){document.documentElement.style.visibility=''},1200);}}catch(e){}",
+          }}
+        />
+      </head>
       <body className="bg-bg text-ink">
         {/* Skip-to-content for keyboard users; appears only when focused. */}
         <a

@@ -132,14 +132,14 @@ export const works: Record<string, WorkEntry> = {
     ],
     images: [
       {
-        src: "/work/aibox/alerts-feed.jpg",
-        alt: "Live alerts feed from AIBox — annotated photos of detected safety violations.",
-        caption: "Alerts feed — every detection arrives with a photo, a video clip, and an assessment workflow.",
+        src: "/work/aibox/scene-day.jpg",
+        alt: "Daytime frame at Petrolimex Aviation, Noi Bai — refueling tanker with an airliner in the background; AIBox annotates each person with PPE status (red=violation, green=compliant, yellow=unknown), each box tagged with a stable track ID.",
+        caption: "Daytime · Noi Bai apron — PPE assessment per person, stable track IDs across frames.",
       },
       {
-        src: "/media/aibox-noibai-001.jpg",
-        alt: "A real frame from AIBox at Petrolimex Aviation Noi Bai — refueling truck and ground crew with YOLO bounding boxes around helmets, vests, and a flagged PPE-negative person.",
-        caption: "Live capture from cam AIB-PA-NOIBAI-001 — Noi Bai airport refueling apron.",
+        src: "/work/aibox/scene-night.jpg",
+        alt: "Night frame at the same site — refueling tanker, two compliant workers in green, one PPE-negative person in red, the ROI overlay traced around the operational zone.",
+        caption: "Night · 23:16 local — same models, same site, no human watching the feed.",
       },
     ],
   },
