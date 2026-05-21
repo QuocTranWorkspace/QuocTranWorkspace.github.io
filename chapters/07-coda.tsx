@@ -8,10 +8,20 @@ import { cn } from "@/lib/utils";
 
 const EMAIL = "quoctranworkspace@gmail.com";
 
-const externalLinks = [
+type ExternalLink = {
+  label: string;
+  href: string;
+  value: string;
+  accent?: "default" | "warm";
+};
+
+const externalLinks: ExternalLink[] = [
   { label: "GitHub", href: "https://github.com/QuocTranWorkspace", value: "@QuocTranWorkspace" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/quoc-tran-trung-070b34268/", value: "quoc-tran-trung" },
   { label: "mnemo", href: "https://github.com/mmct-jsc/mnemo", value: "mmct-jsc/mnemo" },
+  // Ko-fi gets the warm accent — a polite, non-shouty "support" affordance
+  // that lives next to the social links rather than as a separate plea.
+  { label: "Buy me a coffee", href: "https://ko-fi.com/quoctrantrung", value: "ko-fi.com/quoctrantrung", accent: "warm" },
 ];
 
 const container: Variants = {
@@ -150,24 +160,47 @@ export function Coda() {
             </button>
           </motion.div>
 
-          <motion.ul variants={item} className="grid gap-4 sm:grid-cols-3">
-            {externalLinks.map((l) => (
-              <li key={l.label}>
-                <a
-                  href={l.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex h-full flex-col gap-1 rounded-2xl border rule bg-bg-elev/40 px-6 py-5 transition-colors hover:border-accent/40 hover:bg-bg-elev"
-                >
-                  <span className="font-mono text-xs uppercase tracking-widest text-ink-mute">
-                    {l.label}
-                  </span>
-                  <span className="font-display text-xl text-ink transition-colors group-hover:text-accent">
-                    {l.value}
-                  </span>
-                </a>
-              </li>
-            ))}
+          <motion.ul
+            variants={item}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {externalLinks.map((l) => {
+              const warm = l.accent === "warm";
+              return (
+                <li key={l.label}>
+                  <a
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "group flex h-full flex-col gap-1 rounded-2xl border rule bg-bg-elev/40 px-6 py-5 transition-colors hover:bg-bg-elev",
+                      warm
+                        ? "hover:border-accent-warm/50"
+                        : "hover:border-accent/40",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "font-mono text-xs uppercase tracking-widest",
+                        warm ? "text-accent-warm/90" : "text-ink-mute",
+                      )}
+                    >
+                      {l.label}
+                    </span>
+                    <span
+                      className={cn(
+                        "font-display text-xl text-ink transition-colors",
+                        warm
+                          ? "group-hover:text-accent-warm"
+                          : "group-hover:text-accent",
+                      )}
+                    >
+                      {l.value}
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
           </motion.ul>
         </div>
 
