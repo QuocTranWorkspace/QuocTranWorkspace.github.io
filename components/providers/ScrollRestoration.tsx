@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/lib/lenis";
 import { consumeHomeScroll } from "@/lib/scroll-memory";
@@ -40,7 +40,11 @@ const STABLE_FRAMES_REQUIRED = 4;
 const HARD_REVEAL_MS = 1500;
 
 export function ScrollRestoration() {
-  useEffect(() => {
+  // useLayoutEffect (not useEffect) so the hide runs BEFORE the browser
+  // paints the new home tree on a client-side navigation. The pre-paint
+  // <script> only runs on initial HTML parse, not on Next.js Link
+  // navigation, so this is the belt to the script's braces.
+  useLayoutEffect(() => {
     const saved = consumeHomeScroll();
     const hash = window.location.hash;
 

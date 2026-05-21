@@ -38,8 +38,17 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
   return (
     <article className="container-edge py-16 lg:py-24">
       <Link
-        href="/#chapter-3"
+        href="/"
         scroll={false}
+        onClick={() => {
+          // Hide <html> synchronously BEFORE Next starts the client-side
+          // navigation. Otherwise the new home page mounts briefly at
+          // scrollY=0 (chapter 0) before ScrollRestoration can react,
+          // producing the 1-frame flick. The pre-paint inline script in
+          // layout.tsx only runs on initial HTML parse, not on client-
+          // side navigation, so we hide here too.
+          document.documentElement.style.visibility = "hidden";
+        }}
         className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-mute transition-colors hover:text-accent"
       >
         <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
