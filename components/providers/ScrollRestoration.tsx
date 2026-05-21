@@ -8,30 +8,37 @@ import { consumeHomeScroll } from "@/lib/scroll-memory";
 /**
  * Restores scroll position when the user comes back from a /work deep dive.
  *
- * Why this is tricky:
+ * The challenge in this app:
+ *   - The pre-paint <script> in layout.tsx hides <html> the moment we
+ *     see sessionStorage has a saved target. No paint of the wrong
+ *     position is ever visible to the user.
  *   - Chapter 01's horizontal scrub creates a ScrollTrigger pin spacer
- *     AFTER mount. Before the spacer exists, every chapter's offsetTop is
- *     ~800 px lower than its final value.
- *   - Lenis boots on a separate useEffect, so lenis.scrollTo isn't
- *     reliable for the first few frames.
- *   - ScrollTrigger fires `refresh` MULTIPLE times during boot (initial
- *     create, pin spacer injection, font-swap reflow). The FIRST refresh
- *     is the stale one — applying then snaps the user to the wrong
- *     chapter. The LAST refresh has the final layout.
+ *     AFTER mount. Before the spacer exists, every chapter's offsetTop
+ *     is ~800 px lower than its final value. Applying scroll then would
+ *     land the user at the wrong chapter.
+ *   - ScrollTrigger fires `refresh` multiple times during boot (initial
+ *     create, pin-spacer injection, font-swap reflow). A time-based
+ *     debounce on the reveal misses late refreshes on slow machines and
+ *     produces the visible "1-frame flick" the user reported.
  *
- * Strategy:
- *   - The pre-paint <script> in layout.tsx hid <html> synchronously if
- *     sessionStorage has a saved target. No paint of the wrong position
- *     is ever visible.
- *   - Re-apply on EVERY refresh — the latest apply wins, so as the pin
- *     spacer settles in, the target naturally converges to the right
- *     scrollY.
- *   - Debounce the reveal: only un-hide <html> 180 ms after the LAST
- *     apply. If another refresh fires, the reveal is postponed.
- *   - Two timed fallbacks (250 ms + 600 ms) catch the no-pin path
- *     (below lg / reduced motion), and a 1.5 s hard-reveal upper bound
- *     guarantees the page is never stuck blank.
+ * Strategy — layout-stability detection rather than time-based debounce:
+ *   1. On every animation frame, observe documentElement.scrollHeight.
+ *   2. If it changed since last frame, the layout is still shifting:
+ *      re-apply the scroll target (using the current chapter offsetTop)
+ *      and reset the stable-frame counter.
+ *   3. If it stayed the same for N consecutive frames (~70 ms at 60 fps),
+ *      we trust the layout is settled. Re-apply one final time, then
+ *      reveal <html> on the next paint.
+ *   4. Belt-and-braces upper bound (1.5 s) reveals the page unconditionally
+ *      so the user is never stuck blank — same as before.
+ *
+ * Net effect: reveal happens at the moment the page stops shifting, not
+ * a fixed delay. Slow machine? We wait longer. Fast machine? We reveal
+ * almost instantly. No flick on either.
  */
+const STABLE_FRAMES_REQUIRED = 4;
+const HARD_REVEAL_MS = 1500;
+
 export function ScrollRestoration() {
   useEffect(() => {
     const saved = consumeHomeScroll();
@@ -42,7 +49,10 @@ export function ScrollRestoration() {
     const html = document.documentElement;
     html.style.visibility = "hidden";
 
-    let revealTimer: ReturnType<typeof setTimeout> | null = null;
+    let revealed = false;
+    let stableFrames = 0;
+    let lastHeight = -1;
+    let rafId: number | null = null;
 
     const resolveTarget = (): number | null => {
       if (saved) {
@@ -58,43 +68,59 @@ export function ScrollRestoration() {
       return null;
     };
 
-    const scheduleReveal = () => {
-      if (revealTimer !== null) clearTimeout(revealTimer);
-      revealTimer = setTimeout(() => {
-        requestAnimationFrame(() => {
-          html.style.visibility = "";
-        });
-      }, 180);
-    };
-
-    const apply = () => {
+    const applyScroll = () => {
       const target = resolveTarget();
-      if (target === null) return; // chapter not in DOM yet — try next refresh
+      if (target === null) return;
       const lenis = getLenis();
       if (lenis) lenis.scrollTo(target, { immediate: true });
       else window.scrollTo(0, target);
-      scheduleReveal();
     };
 
-    ScrollTrigger.addEventListener("refresh", apply);
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      // Final apply with the now-stable layout, then reveal on next paint.
+      applyScroll();
+      requestAnimationFrame(() => {
+        html.style.visibility = "";
+      });
+    };
 
-    // Fallbacks for paths where ScrollTrigger never refreshes (below lg,
-    // reduced motion, or if the chapter-1 pin failed to attach).
-    const fallback1 = setTimeout(apply, 250);
-    const fallback2 = setTimeout(apply, 600);
+    const tick = () => {
+      if (revealed) return;
+      const h = html.scrollHeight;
+      if (h !== lastHeight) {
+        // Layout shifted (or first frame) — re-apply target with current
+        // offsetTops and reset the stability counter.
+        applyScroll();
+        lastHeight = h;
+        stableFrames = 0;
+      } else {
+        stableFrames += 1;
+      }
+      if (stableFrames >= STABLE_FRAMES_REQUIRED) {
+        reveal();
+        return;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
 
-    // Hard upper bound — never block visibility for more than 1.5 s
-    // even if every layer above failed.
-    const hardReveal = setTimeout(() => {
-      html.style.visibility = "";
-    }, 1500);
+    // ScrollTrigger.refresh sometimes happens without a scrollHeight delta
+    // (no pin involved). Treat it as a layout signal too.
+    const onRefresh = () => {
+      applyScroll();
+      stableFrames = 0;
+    };
+    ScrollTrigger.addEventListener("refresh", onRefresh);
+
+    rafId = requestAnimationFrame(tick);
+    const hardReveal = setTimeout(reveal, HARD_REVEAL_MS);
 
     return () => {
-      ScrollTrigger.removeEventListener("refresh", apply);
-      clearTimeout(fallback1);
-      clearTimeout(fallback2);
+      ScrollTrigger.removeEventListener("refresh", onRefresh);
+      if (rafId !== null) cancelAnimationFrame(rafId);
       clearTimeout(hardReveal);
-      if (revealTimer !== null) clearTimeout(revealTimer);
       html.style.visibility = "";
     };
   }, []);
