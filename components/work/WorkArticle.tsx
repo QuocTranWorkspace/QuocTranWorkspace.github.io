@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useLayoutEffect } from "react";
 import type { WorkEntry } from "@/content/work";
 import { getLenis } from "@/lib/lenis";
+import { hideRouteLoader, showRouteLoader } from "@/lib/route-loader";
 import { cn } from "@/lib/utils";
 
 const container: Variants = {
@@ -29,10 +30,26 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
   // Lenis is a singleton across pages — when navigating in from chapter 3
   // at scrollY≈4500, the new /work page inherits that scroll and the user
   // lands at the bottom. Force scroll to 0 before paint.
+  //
+  // The route loader is already showing (Chapter 03's card-click triggered
+  // it) — we run the snap-to-top synchronously, wait two RAFs for the new
+  // tree to commit + paint at scrollY=0, then signal hide. The loader's
+  // minimum-hold logic guarantees a perceived "loading" beat even when the
+  // settle is instant.
   useLayoutEffect(() => {
     const lenis = getLenis();
     if (lenis) lenis.scrollTo(0, { immediate: true });
     else window.scrollTo(0, 0);
+
+    // Double-RAF = wait until after the next paint. By the second frame
+    // the browser has committed the post-scroll layout.
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => {
+        hideRouteLoader();
+      });
+      return () => cancelAnimationFrame(raf2);
+    });
+    return () => cancelAnimationFrame(raf1);
   }, []);
 
   return (
@@ -41,13 +58,13 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
         href="/"
         scroll={false}
         onClick={() => {
-          // Hide <html> synchronously BEFORE Next starts the client-side
-          // navigation. Otherwise the new home page mounts briefly at
-          // scrollY=0 (chapter 0) before ScrollRestoration can react,
-          // producing the 1-frame flick. The pre-paint inline script in
-          // layout.tsx only runs on initial HTML parse, not on client-
-          // side navigation, so we hide here too.
-          document.documentElement.style.visibility = "hidden";
+          // Show the route loader BEFORE Next.js starts the client-side
+          // navigation. The loader is mounted at the layout root and
+          // persists across the page-tree swap, masking the moment when
+          // the new home page mounts at scrollY=0 (chapter 0) before
+          // <ScrollRestoration> snaps to the saved chapter. ScrollRestoration
+          // calls hideRouteLoader() once layout is stable.
+          showRouteLoader();
         }}
         className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-mute transition-colors hover:text-accent"
       >
@@ -299,6 +316,14 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
         <Link
           href="/#chapter-3"
           scroll={false}
+          onClick={() => {
+            // Same masking logic as the top "Back to portfolio" link, but
+            // this one targets a specific chapter via the hash — the home
+            // page's ScrollRestoration honors window.location.hash when no
+            // saved-scroll is present, scrolling to the named chapter once
+            // layout is stable. The loader covers that window.
+            showRouteLoader();
+          }}
           className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-mute transition-colors hover:text-accent"
         >
           <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />

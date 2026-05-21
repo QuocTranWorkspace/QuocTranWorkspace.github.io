@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+import { RouteLoader } from "@/components/providers/RouteLoader";
 import { SideDots } from "@/components/nav/SideDots";
 import { ToastProvider } from "@/components/ui/Toast";
 import "@/styles/globals.css";
@@ -97,6 +98,13 @@ export default function RootLayout({
           <ToastProvider>
             {children}
             <SideDots />
+            {/* RouteLoader is the LAST child of the layout tree so it paints
+                above everything else. It persists across route changes — the
+                layout doesn't unmount on navigation, only the page subtree
+                does — so a loader started by a Link's onClick survives the
+                tree swap and stays visible until the destination signals
+                ready via hideRouteLoader(). */}
+            <RouteLoader />
           </ToastProvider>
         </SmoothScrollProvider>
       </body>

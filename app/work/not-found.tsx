@@ -1,5 +1,8 @@
-import Link from "next/link";
+"use client";
+
 import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { showRouteLoader } from "@/lib/route-loader";
 
 export default function NotFound() {
   return (
@@ -17,6 +20,12 @@ export default function NotFound() {
         </p>
         <Link
           href="/#chapter-3"
+          scroll={false}
+          onClick={() => {
+            // Same masking as the other internal nav points — the route
+            // loader covers the home-page mount + scroll-to-chapter-3 hop.
+            showRouteLoader();
+          }}
           className="group inline-flex items-center gap-2 rounded-full border border-accent/40 bg-bg-elev px-5 py-2 font-mono text-xs uppercase tracking-widest text-accent transition-colors hover:bg-accent hover:text-bg"
         >
           <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />

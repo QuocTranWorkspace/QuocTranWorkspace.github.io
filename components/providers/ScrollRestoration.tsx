@@ -3,15 +3,13 @@
 import { useLayoutEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/lib/lenis";
+import { hideRouteLoader } from "@/lib/route-loader";
 import { consumeHomeScroll } from "@/lib/scroll-memory";
 
 /**
  * Restores scroll position when the user comes back from a /work deep dive.
  *
  * The challenge in this app:
- *   - The pre-paint <script> in layout.tsx hides <html> the moment we
- *     see sessionStorage has a saved target. No paint of the wrong
- *     position is ever visible to the user.
  *   - Chapter 01's horizontal scrub creates a ScrollTrigger pin spacer
  *     AFTER mount. Before the spacer exists, every chapter's offsetTop
  *     is ~800 px lower than its final value. Applying scroll then would
@@ -21,16 +19,25 @@ import { consumeHomeScroll } from "@/lib/scroll-memory";
  *     debounce on the reveal misses late refreshes on slow machines and
  *     produces the visible "1-frame flick" the user reported.
  *
- * Strategy — layout-stability detection rather than time-based debounce:
+ * Two masking strategies, picked automatically:
+ *   - INITIAL load with saved scroll: the pre-paint <script> in layout.tsx
+ *     hides <html> synchronously before any paint. The page is invisible
+ *     until we reveal it at the end of stability polling.
+ *   - CLIENT-side nav from a back link: a Link onClick triggered the
+ *     <RouteLoader> overlay (rendered above everything). We DON'T touch
+ *     html.visibility — that would hide the loader too — and instead
+ *     signal the loader to fade out at the end of stability polling.
+ *
+ * Stability detection — layout-stability rather than time-based debounce:
  *   1. On every animation frame, observe documentElement.scrollHeight.
  *   2. If it changed since last frame, the layout is still shifting:
  *      re-apply the scroll target (using the current chapter offsetTop)
  *      and reset the stable-frame counter.
  *   3. If it stayed the same for N consecutive frames (~70 ms at 60 fps),
  *      we trust the layout is settled. Re-apply one final time, then
- *      reveal <html> on the next paint.
- *   4. Belt-and-braces upper bound (1.5 s) reveals the page unconditionally
- *      so the user is never stuck blank — same as before.
+ *      reveal on the next paint.
+ *   4. Belt-and-braces upper bound (1.5 s) reveals unconditionally so the
+ *      user is never stuck behind the loader/blank page.
  *
  * Net effect: reveal happens at the moment the page stops shifting, not
  * a fixed delay. Slow machine? We wait longer. Fast machine? We reveal
@@ -48,10 +55,29 @@ export function ScrollRestoration() {
     const saved = consumeHomeScroll();
     const hash = window.location.hash;
 
-    if (!saved && !hash) return;
+    if (!saved && !hash) {
+      // No restoration to do. If the route loader is showing (e.g. user
+      // clicked a back link that didn't have saved-scroll), hide it now
+      // — there's nothing to wait for, the page is already at the right
+      // place. No-op when the loader isn't showing.
+      hideRouteLoader();
+      return;
+    }
 
     const html = document.documentElement;
-    html.style.visibility = "hidden";
+
+    // Decide which masking strategy to use:
+    //   - INITIAL load with saved scroll: the pre-paint inline <script> in
+    //     layout.tsx has already set html.style.visibility = "hidden". The
+    //     <RouteLoader> can't help here — it's a React component and the
+    //     page hasn't finished hydrating yet — so we keep managing
+    //     visibility ourselves and reveal at the end.
+    //   - CLIENT-side nav (Back-link click): visibility is unset. The
+    //     <RouteLoader> overlay is already painted on top and will fade
+    //     out when we signal hide. Don't touch html.visibility — toggling
+    //     it would hide the loader along with everything else, creating
+    //     the exact flick we're trying to eliminate.
+    const usingHtmlVisibility = html.style.visibility === "hidden";
 
     let revealed = false;
     let stableFrames = 0;
@@ -87,7 +113,15 @@ export function ScrollRestoration() {
       // Final apply with the now-stable layout, then reveal on next paint.
       applyScroll();
       requestAnimationFrame(() => {
-        html.style.visibility = "";
+        if (usingHtmlVisibility) {
+          // Initial load: un-hide the pre-paint-hidden html, then signal
+          // the loader to fade (it's almost certainly not showing on a
+          // fresh hit, but this is harmless if it is).
+          html.style.visibility = "";
+        }
+        // Client-side nav: the loader is the only thing masking — fade it.
+        // On initial load this is a no-op when the loader isn't showing.
+        hideRouteLoader();
       });
     };
 

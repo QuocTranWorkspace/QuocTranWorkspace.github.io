@@ -4,6 +4,7 @@ import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { workSlugs } from "@/content/work";
+import { showRouteLoader } from "@/lib/route-loader";
 import { rememberHomeScroll } from "@/lib/scroll-memory";
 import { cn } from "@/lib/utils";
 
@@ -188,7 +189,17 @@ export function LeadArc() {
               {hasDeepDive ? (
                 <Link
                   href={`/work/${t.slug}`}
-                  onClick={rememberHomeScroll}
+                  onClick={() => {
+                    // Save scroll first so consumeHomeScroll() can read it
+                    // on the eventual return trip, then mask the forward-
+                    // nav flick with the global route loader. Order matters
+                    // — rememberHomeScroll reads window.scrollY which the
+                    // loader doesn't touch, so either order works, but
+                    // putting the user-visible effect (loader) second
+                    // means a slow sessionStorage write can't delay it.
+                    rememberHomeScroll();
+                    showRouteLoader();
+                  }}
                   aria-label={`Read the ${t.name} deep dive`}
                   className="flex h-full flex-col justify-between p-6 focus-visible:outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
