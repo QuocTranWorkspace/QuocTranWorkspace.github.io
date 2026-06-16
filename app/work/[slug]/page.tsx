@@ -19,18 +19,22 @@ export async function generateMetadata({
   if (!entry) {
     return { title: "Work" };
   }
+  // Metadata is rendered at static-export time, before the client locale
+  // is known — use the EN copy as the SEO surface. The page body still
+  // swaps to VI client-side via <WorkArticle> + useLocale.
+  const description = entry.tagline.en;
   return {
     title: entry.name,
-    description: entry.tagline,
+    description,
     openGraph: {
       title: `${entry.name} · Quoc Tran Trung`,
-      description: entry.tagline,
+      description,
       type: "article",
     },
     twitter: {
       card: "summary_large_image",
       title: `${entry.name} · Quoc Tran Trung`,
-      description: entry.tagline,
+      description,
     },
   };
 }

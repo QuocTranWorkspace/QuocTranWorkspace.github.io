@@ -3,6 +3,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Search } from "lucide-react";
 import { useDeferredValue, useMemo, useState } from "react";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings } from "@/content/strings";
+import { t } from "@/lib/i18n";
 import { useMnemoVersion } from "@/lib/use-mnemo-version";
 import { cn } from "@/lib/utils";
 
@@ -133,7 +136,6 @@ const WEIGHTS = {
   lexical: 0.2,
 } as const;
 
-// Score one node against a query — returns each term's contribution and total.
 function scoreNode(query: string, node: MemoryNode): Scored {
   const qTokens = tokenize(query);
   const qSet = new Set(qTokens);
@@ -141,18 +143,11 @@ function scoreNode(query: string, node: MemoryNode): Scored {
   const nTokens = tokenize(nodeText);
   const nSet = new Set(nTokens);
 
-  // "Vector similarity" — Jaccard over tokens as a fast stand-in for cosine.
   const vector = jaccard(qSet, nSet);
-
-  // "Typed-edge graph" — overlap with tags.
   const tagSet = new Set(node.tags);
   const graph = jaccard(qSet, tagSet);
-
-  // Recency baked into the node, scaled to 0..1.
   const recency = node.recency;
 
-  // Type bias — feedback wins on "how-to" queries, project memory wins on
-  // architecture / what-is queries.
   const lowered = query.toLowerCase();
   const wantsHow = /\b(how|why|workflow|gotcha|fix|debug)\b/.test(lowered);
   const wantsArch = /\b(architecture|build|stack|model|system|graph|scoring)\b/.test(lowered);
@@ -163,10 +158,8 @@ function scoreNode(query: string, node: MemoryNode): Scored {
         ? 1
         : 0.3;
 
-  // Project — does the query mention the node's project name?
   const project = node.project && lowered.includes(node.project) ? 1 : 0;
 
-  // Lexical overlap — count exact substring matches of query tokens in name+description.
   const lexicalHits =
     qTokens.filter((t) => nodeText.includes(t)).length / Math.max(qTokens.length, 1);
   const lexical = lexicalHits;
@@ -184,8 +177,6 @@ function scoreNode(query: string, node: MemoryNode): Scored {
 }
 
 function aggregateTerms(scored: Scored[]): Record<string, number> {
-  // For the breakdown bars, show the AVERAGE contribution of each term across
-  // the top hits — gives the user a feel for which term carried the recall.
   const top = scored.slice(0, 3);
   if (top.length === 0) {
     return { vector: 0, graph: 0, recency: 0, type: 0, project: 0, lexical: 0 };
@@ -209,57 +200,52 @@ function aggregateTerms(scored: Scored[]): Record<string, number> {
   return sums;
 }
 
-// ---------- Static content ----------
+// ---------- Static metadata + per-locale defaults ----------
 
-const SCORE_TERMS_META = [
-  { key: "vector", weight: WEIGHTS.vector, label: "Vector similarity" },
-  { key: "graph", weight: WEIGHTS.graph, label: "Typed-edge graph" },
-  { key: "recency", weight: WEIGHTS.recency, label: "Recency (90d half-life)" },
-  { key: "type", weight: WEIGHTS.type, label: "Memory type bias" },
-  { key: "project", weight: WEIGHTS.project, label: "Project scope" },
-  { key: "lexical", weight: WEIGHTS.lexical, label: "Lexical overlap" },
+// Score term keys match the SCORE_TERMS_META lookup. Labels are pulled per
+// locale from strings.mnemo.scoreTerms inside the component.
+const SCORE_TERM_KEYS = [
+  { key: "vector", weight: WEIGHTS.vector },
+  { key: "graph", weight: WEIGHTS.graph },
+  { key: "recency", weight: WEIGHTS.recency },
+  { key: "type", weight: WEIGHTS.type },
+  { key: "project", weight: WEIGHTS.project },
+  { key: "lexical", weight: WEIGHTS.lexical },
+] as const;
+
+const NUMERIC_STATS = [
+  { value: "100%", key: "accuracy" as const },
+  { value: "1.000", key: "mrr" as const },
+  { value: "17 ms", key: "median" as const },
+  { value: "≤ 800", key: "tokens" as const },
 ];
-
-const stats = [
-  { value: "100%", label: "top-1 accuracy" },
-  { value: "1.000", label: "MRR" },
-  { value: "17 ms", label: "median query" },
-  { value: "≤ 800", label: "tokens injected per prompt" },
-];
-
-const SUGGESTIONS = [
-  "how does the scoring work",
-  "alpine gotchas",
-  "edge AI detection on jetson",
-  "release workflow",
-];
-
-const DEFAULT_QUERY = "how does the scoring work";
 
 // ---------- Component ----------
 
 export function Mnemo() {
+  const { locale } = useLocale();
+  const s = strings.mnemo;
   const mnemo = useMnemoVersion();
-  const [query, setQuery] = useState(DEFAULT_QUERY);
-  // Deferring keeps typing snappy while letting the heavier scoring math
-  // settle a frame behind. (No real perf cost here — the corpus is tiny —
-  // but matches the actual mnemo daemon's debounced re-query feel.)
+
+  // Suggestions and the default initial query come from the per-locale
+  // strings. The scoring corpus stays in English — the data is what mnemo
+  // would have indexed from a real EN-language codebase.
+  const localizedSuggestions = s.suggestions.map((sug) => t(sug, locale));
+  const defaultQuery = localizedSuggestions[0]!;
+  const [query, setQuery] = useState(defaultQuery);
   const deferredQuery = useDeferredValue(query);
 
   const { hits, termAverages } = useMemo(() => {
     const scored = corpus
       .map((node) => scoreNode(deferredQuery, node))
       .sort((a, b) => b.total - a.total)
-      // Drop near-zero matches so empty queries don't render six fake hits.
-      .filter((s) => s.total > 0.04);
+      .filter((sc) => sc.total > 0.04);
     return {
       hits: scored.slice(0, 3),
       termAverages: aggregateTerms(scored),
     };
   }, [deferredQuery]);
 
-  // Each bar's fill = average term contribution (0..1) normalized against
-  // the maximum across all terms so the strongest bar always fills its track.
   const maxTerm = Math.max(0.001, ...Object.values(termAverages));
 
   return (
@@ -271,15 +257,15 @@ export function Mnemo() {
       <div className="container-edge">
         <header className="mb-10 max-w-3xl space-y-3">
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-[0.3em] text-accent-warm">
-            <span>Chapter 05 · mnemo</span>
+            <span>{t(s.eyebrow, locale)}</span>
             <a
               href="https://github.com/mmct-jsc/mnemo/releases"
               target="_blank"
               rel="noopener noreferrer"
               title={
                 mnemo.live
-                  ? "Live from GitHub releases"
-                  : "Build-time version (GitHub API unreachable)"
+                  ? t(s.versionLiveTitle, locale)
+                  : t(s.versionFallbackTitle, locale)
               }
               className="inline-flex items-center gap-1.5 rounded-full border border-accent-warm/40 px-2 py-0.5 normal-case tracking-normal text-accent-warm transition-colors hover:bg-accent-warm hover:text-bg"
             >
@@ -290,29 +276,22 @@ export function Mnemo() {
                 )}
                 aria-hidden
               />
-              {mnemo.version} published
+              {mnemo.version}
+              {t(s.versionSuffix, locale)}
             </a>
           </p>
           <h2 className="font-display text-5xl md:text-7xl text-balance">
-            <span className="italic text-accent-warm">A memory layer</span> that
-            makes Claude Code remember what you&rsquo;ve already taught it.
+            <span className="italic text-accent-warm">{t(s.headlineLead, locale)}</span>
+            {t(s.headlineTail, locale)}
           </h2>
           <p className="text-ink-mute text-lg max-w-2xl text-balance">
-            All the lessons you teach an AI coding assistant — your team&rsquo;s
-            patterns, your design decisions, the gotchas you keep re-learning —
-            collected into a small searchable graph on your own laptop. mnemo
-            picks the most relevant pieces every time you ask the AI a
-            question, and feeds them in automatically, with citations,
-            capped at a small budget so it never floods the conversation.
-            Open source, runs offline, shipping new releases continuously
-            (the version above is live from GitHub).
+            {t(s.description, locale)}
           </p>
         </header>
 
-        {/* Interactive query — drives the breakdown bars + hit list below */}
         <div className="mb-8 max-w-2xl">
           <label className="sr-only" htmlFor="mnemo-query">
-            Try a mnemo query
+            {t(s.queryLabel, locale)}
           </label>
           <div className="group flex items-center gap-3 rounded-xl border rule bg-bg-elev/60 px-4 py-3 transition-colors focus-within:border-accent-warm/60">
             <Search className="size-4 shrink-0 text-ink-mute" aria-hidden />
@@ -321,30 +300,30 @@ export function Mnemo() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Try a query against a six-node mock corpus…"
+              placeholder={t(s.queryPlaceholder, locale)}
               className="flex-1 bg-transparent font-mono text-sm text-ink placeholder:text-ink-mute focus:outline-none"
               autoComplete="off"
               spellCheck="false"
             />
             <span className="hidden sm:inline font-mono text-[10px] uppercase tracking-widest text-ink-mute">
-              live
+              {t(s.queryLiveBadge, locale)}
             </span>
           </div>
           <ul className="mt-3 flex flex-wrap gap-2">
-            {SUGGESTIONS.map((s) => (
-              <li key={s}>
+            {localizedSuggestions.map((sug) => (
+              <li key={sug}>
                 <button
                   type="button"
-                  onClick={() => setQuery(s)}
+                  onClick={() => setQuery(sug)}
                   className={cn(
                     "rounded-full border rule px-3 py-1 font-mono text-[11px] uppercase tracking-widest transition-colors",
                     "hover:border-accent-warm/40 hover:text-accent-warm",
-                    query === s
+                    query === sug
                       ? "border-accent-warm/50 text-accent-warm"
                       : "text-ink-mute",
                   )}
                 >
-                  {s}
+                  {sug}
                 </button>
               </li>
             ))}
@@ -355,24 +334,24 @@ export function Mnemo() {
           <div className="flex flex-col rounded-2xl border rule bg-bg-elev/60 p-6 sm:p-8">
             <div className="mb-6 flex items-baseline justify-between">
               <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-mute">
-                Scoring breakdown
+                {t(s.scoringHeader, locale)}
               </p>
               <p className="font-mono text-[10px] uppercase tracking-widest text-ink-mute">
-                avg of top {hits.length || 0}
+                {t(s.avgOfTop, locale)} {hits.length || 0}
               </p>
             </div>
             <ul className="flex flex-1 flex-col justify-between gap-3">
-              {SCORE_TERMS_META.map((t) => {
-                const contribution = termAverages[t.key] ?? 0;
+              {SCORE_TERM_KEYS.map((tk) => {
+                const contribution = termAverages[tk.key] ?? 0;
                 const fill = (contribution / maxTerm) * 100;
                 return (
                   <li
-                    key={t.key}
+                    key={tk.key}
                     className="grid grid-cols-[2.5rem_minmax(0,1fr)_3rem] items-center gap-3 sm:grid-cols-[3rem_minmax(0,1fr)_5rem] sm:gap-4 lg:grid-cols-[3rem_minmax(0,1fr)_7rem]"
                   >
-                    <span className="stat text-xs">{t.weight.toFixed(2)}</span>
+                    <span className="stat text-xs">{tk.weight.toFixed(2)}</span>
                     <span className="font-mono text-xs sm:text-sm text-ink">
-                      {t.label}
+                      {t(s.scoreTerms[tk.key], locale)}
                     </span>
                     <span
                       aria-hidden
@@ -390,26 +369,25 @@ export function Mnemo() {
           </div>
 
           <ul className="grid h-full grid-cols-2 grid-rows-2 gap-4">
-            {stats.map((s) => (
+            {NUMERIC_STATS.map((stat) => (
               <li
-                key={s.label}
+                key={stat.key}
                 className="flex flex-col justify-center rounded-2xl border rule bg-bg-elev/60 p-5 sm:p-6"
               >
                 <p className="stat text-2xl sm:text-3xl text-accent-warm">
-                  {s.value}
+                  {stat.value}
                 </p>
                 <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
-                  {s.label}
+                  {t(s.statLabels[stat.key], locale)}
                 </p>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Top-3 hits — animate in/out as the query changes */}
         <div className="mt-8 rounded-2xl border rule bg-bg-elev/30 p-6 sm:p-8">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-mute mb-4">
-            Top hits
+            {t(s.topHitsHeader, locale)}
           </p>
           <AnimatePresence mode="popLayout" initial={false}>
             {hits.length === 0 ? (
@@ -420,7 +398,7 @@ export function Mnemo() {
                 exit={{ opacity: 0 }}
                 className="font-mono text-sm text-ink-mute"
               >
-                No nodes scored above threshold. Try a more specific term.
+                {t(s.emptyHits, locale)}
               </motion.p>
             ) : (
               <ul className="space-y-3">
@@ -455,11 +433,10 @@ export function Mnemo() {
           </AnimatePresence>
         </div>
 
-        {/* Live demo embed — the real mnemo "Nebula" UI, not a mock */}
         <div className="mt-12">
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
             <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-mute">
-              Live demo · the real UI
+              {t(s.demoLabel, locale)}
             </p>
             <a
               href="https://mmct-jsc.github.io/mnemo/"
@@ -467,14 +444,14 @@ export function Mnemo() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-accent-warm transition-colors hover:underline underline-offset-4"
             >
-              Open full-screen
+              {t(s.demoFullscreen, locale)}
               <ArrowUpRight className="size-3.5" aria-hidden />
             </a>
           </div>
           <div className="relative overflow-hidden rounded-2xl border rule bg-bg-elev">
             <iframe
               src="https://mmct-jsc.github.io/mnemo/"
-              title="mnemo live Nebula demo — interactive knowledge graph UI"
+              title={t(s.demoIframeTitle, locale)}
               loading="lazy"
               referrerPolicy="no-referrer"
               sandbox="allow-scripts allow-same-origin allow-popups"
@@ -484,8 +461,7 @@ export function Mnemo() {
         </div>
 
         <p className="mt-8 text-ink-mute text-sm max-w-2xl">
-          The query box above is a six-node mock that mirrors the scoring; the
-          embed is the real shipped demo. Source:&nbsp;
+          {t(s.footerA, locale)}
           <a
             href="https://github.com/mmct-jsc/mnemo"
             target="_blank"
@@ -496,9 +472,9 @@ export function Mnemo() {
           </a>
           {mnemo.live ? (
             <>
-              {" "}
-              · running <span className="text-accent-warm">{mnemo.version}</span>{" "}
-              as of your visit.
+              {t(s.footerLive, locale)}
+              <span className="text-accent-warm">{mnemo.version}</span>
+              {t(s.footerLiveTail, locale)}
             </>
           ) : (
             <>.</>

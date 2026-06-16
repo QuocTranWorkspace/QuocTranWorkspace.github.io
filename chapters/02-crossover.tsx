@@ -1,15 +1,10 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings } from "@/content/strings";
+import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-
-const pipelineStages = [
-  { id: "01", label: "Video", note: "Source ingestion" },
-  { id: "02", label: "Analysis", note: "OpenAI + YouTube APIs" },
-  { id: "03", label: "Ideation", note: "Topic + angle generation" },
-  { id: "04", label: "Script", note: "Long-form narrative" },
-  { id: "05", label: "Storyboard", note: "Shot list + thumbnails" },
-];
 
 const stageContainer: Variants = {
   hidden: {},
@@ -43,6 +38,10 @@ const lineVariant: Variants = {
 const viewportOpts = { once: true, amount: 0.35 };
 
 export function Crossover() {
+  const { locale } = useLocale();
+  const s = strings.crossover;
+  const stages = s.stages;
+
   return (
     <section
       id="chapter-2"
@@ -60,23 +59,19 @@ export function Crossover() {
           variants={stageItem}
           className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
         >
-          Chapter 02 · Crossover · Mar — Jul 2025
+          {t(s.eyebrow, locale)}
         </motion.p>
         <motion.h2
           variants={stageItem}
           className="font-display text-5xl md:text-7xl text-balance"
         >
-          Bitsness gave me my first AI automation gig.
+          {t(s.headline, locale)}
         </motion.h2>
         <motion.p
           variants={stageItem}
           className="text-ink-mute text-lg max-w-2xl text-balance"
         >
-          The platform ran a YouTube channel&rsquo;s next video through five
-          automated stages — research, ideation, scripting, storyboard,
-          finishing — before a human editor ever opened it. My job was the
-          backend pipeline that orchestrated it, the security around access,
-          and the deploy pipeline that took it from laptop to staging.
+          {t(s.subtitle, locale)}
         </motion.p>
       </motion.header>
 
@@ -113,15 +108,15 @@ export function Crossover() {
           variants={stageContainer}
           className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
         >
-          {pipelineStages.map((s) => (
+          {stages.map((stage) => (
             <motion.li
-              key={s.id}
+              key={stage.id}
               variants={stageItem}
               className="group relative rounded-xl border rule bg-bg-elev/60 p-6 backdrop-blur-sm transition-colors hover:border-accent/40"
             >
-              <span className="stat text-xs text-ink-mute">{s.id}</span>
-              <h3 className="mt-4 font-display text-2xl">{s.label}</h3>
-              <p className="mt-2 text-sm text-ink-mute">{s.note}</p>
+              <span className="stat text-xs text-ink-mute">{stage.id}</span>
+              <h3 className="mt-4 font-display text-2xl">{t(stage.label, locale)}</h3>
+              <p className="mt-2 text-sm text-ink-mute">{t(stage.note, locale)}</p>
               <span
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-accent/0 transition-all duration-500 group-hover:ring-accent/30"
@@ -138,9 +133,7 @@ export function Crossover() {
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
         className="mt-12 max-w-2xl text-ink-mute text-base"
       >
-        I led the backend split — modular NestJS services, repository pattern,
-        role-based guards — and built the GitLab pipelines that took it from
-        laptop to staging.
+        {t(s.closer, locale)}
       </motion.p>
     </section>
   );

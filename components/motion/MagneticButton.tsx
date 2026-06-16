@@ -69,7 +69,11 @@ export function MagneticButton({
       className={cn(
         "inline-flex items-center gap-3 rounded-full border border-accent/40 bg-bg-elev px-6 py-3",
         "font-mono text-xs uppercase tracking-widest text-accent",
-        "transition-colors hover:border-accent hover:bg-accent hover:text-bg",
+        "transition-[colors,box-shadow] duration-300",
+        "hover:border-accent hover:bg-accent hover:text-bg",
+        // Soft cobalt aura on hover — uses --color-accent-glow so a
+        // future palette change updates here too.
+        "hover:shadow-[0_0_30px_rgba(var(--color-accent-glow)/0.35)]",
         className,
       )}
       {...rest}

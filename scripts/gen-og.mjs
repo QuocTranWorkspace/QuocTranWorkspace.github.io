@@ -18,12 +18,13 @@ import { dirname, join } from "node:path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, "..", "public", "og.png");
 
-const BG = "#0B0D12";
-const BG_ELEV = "#12151D";
-const INK = "#ECEEF2";
-const INK_MUTE = "#8A93A2";
-const ACCENT = "#6CE5C7";
-const RULE = "#1F2330";
+// Kept in sync with @theme tokens in styles/globals.css.
+const BG = "#0B0D14";
+const BG_ELEV = "#10172A";
+const INK = "#ECEEF6";
+const INK_MUTE = "#8B95AC";
+const ACCENT = "#4F7EFF";
+const RULE = "#1E2540";
 
 const mono = "ui-monospace, SFMono-Regular, Menlo, monospace";
 

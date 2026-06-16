@@ -5,7 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLayoutEffect } from "react";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings } from "@/content/strings";
 import type { WorkEntry } from "@/content/work";
+import { t } from "@/lib/i18n";
 import { getLenis } from "@/lib/lenis";
 import { hideRouteLoader, showRouteLoader } from "@/lib/route-loader";
 import { cn } from "@/lib/utils";
@@ -27,6 +30,9 @@ const item: Variants = {
 const viewportOpts = { once: true, amount: 0.25 };
 
 export function WorkArticle({ entry }: { entry: WorkEntry }) {
+  const { locale } = useLocale();
+  const wa = strings.workArticle;
+
   // Lenis is a singleton across pages — when navigating in from chapter 3
   // at scrollY≈4500, the new /work page inherits that scroll and the user
   // lands at the bottom. Force scroll to 0 before paint.
@@ -41,8 +47,6 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
     if (lenis) lenis.scrollTo(0, { immediate: true });
     else window.scrollTo(0, 0);
 
-    // Double-RAF = wait until after the next paint. By the second frame
-    // the browser has committed the post-scroll layout.
     const raf1 = requestAnimationFrame(() => {
       const raf2 = requestAnimationFrame(() => {
         hideRouteLoader();
@@ -69,7 +73,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
         className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-mute transition-colors hover:text-accent"
       >
         <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
-        Back to portfolio
+        {t(wa.backToHome, locale)}
       </Link>
 
       <motion.header
@@ -82,7 +86,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           variants={item}
           className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
         >
-          {entry.caption}
+          {t(entry.caption, locale)}
         </motion.p>
         <motion.h1
           variants={item}
@@ -94,16 +98,16 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           variants={item}
           className="text-ink-mute text-lg max-w-2xl text-balance"
         >
-          {entry.tagline}
+          {t(entry.tagline, locale)}
         </motion.p>
         <motion.dl
           variants={item}
           className="grid gap-x-10 gap-y-3 pt-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           {[
-            ["Period", entry.period],
-            ["Role", entry.role],
-            ["Client", entry.client],
+            [t(wa.metaPeriod, locale), t(entry.period, locale)] as const,
+            [t(wa.metaRole, locale), t(entry.role, locale)] as const,
+            [t(wa.metaClient, locale), t(entry.client, locale)] as const,
           ].map(([label, value]) => (
             <div key={label} className="space-y-1">
               <dt className="font-mono text-[10px] uppercase tracking-widest text-ink-mute">
@@ -124,10 +128,10 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
         className="mt-16 grid grid-cols-2 gap-6 md:grid-cols-4"
       >
         {entry.outcomes.map((o) => (
-          <motion.div key={o.label} variants={item} className="space-y-2">
+          <motion.div key={o.label.en} variants={item} className="space-y-2">
             <p className="stat text-3xl md:text-4xl text-accent">{o.value}</p>
             <p className="font-mono text-[11px] uppercase tracking-widest text-ink-mute">
-              {o.label}
+              {t(o.label, locale)}
             </p>
           </motion.div>
         ))}
@@ -144,13 +148,13 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           variants={item}
           className="font-mono text-xs uppercase tracking-[0.3em] text-ink-mute"
         >
-          Problem
+          {t(wa.sectionProblem, locale)}
         </motion.h2>
         <motion.p
           variants={item}
           className="font-display text-2xl md:text-3xl leading-snug text-ink text-balance"
         >
-          {entry.problem}
+          {t(entry.problem, locale)}
         </motion.p>
       </motion.section>
 
@@ -165,7 +169,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           variants={item}
           className="font-mono text-xs uppercase tracking-[0.3em] text-ink-mute"
         >
-          Approach
+          {t(wa.sectionApproach, locale)}
         </motion.h2>
         <ol className="space-y-4 list-none">
           {entry.approach.map((step, i) => (
@@ -177,7 +181,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
               <span className="stat text-sm text-accent">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <p className="text-ink text-base leading-relaxed">{step}</p>
+              <p className="text-ink text-base leading-relaxed">{t(step, locale)}</p>
             </motion.li>
           ))}
         </ol>
@@ -195,7 +199,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
             variants={item}
             className="font-mono text-xs uppercase tracking-[0.3em] text-ink-mute"
           >
-            From the live product
+            {t(wa.sectionGallery, locale)}
           </motion.h2>
           <ul className="grid gap-6 sm:grid-cols-2">
             {entry.images.map((img, i) => (
@@ -203,8 +207,6 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
                 key={img.src}
                 variants={item}
                 className={cn(
-                  // First image in a two-column gallery spans both columns
-                  // on sm+ for a stronger hero effect.
                   "overflow-hidden rounded-2xl border rule bg-bg-elev/40",
                   i === 0 && entry.images!.length > 1 && "sm:col-span-2",
                 )}
@@ -212,7 +214,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
                 <div className="relative aspect-[16/9] w-full">
                   <Image
                     src={img.src}
-                    alt={img.alt}
+                    alt={t(img.alt, locale)}
                     fill
                     sizes={
                       i === 0
@@ -224,7 +226,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
                 </div>
                 {img.caption ? (
                   <p className="px-4 py-3 font-mono text-[11px] uppercase tracking-widest text-ink-mute">
-                    {img.caption}
+                    {t(img.caption, locale)}
                   </p>
                 ) : null}
               </motion.li>
@@ -244,12 +246,9 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           variants={item}
           className="font-mono text-xs uppercase tracking-[0.3em] text-ink-mute"
         >
-          Stack
+          {t(wa.sectionStack, locale)}
         </motion.h2>
-        <motion.ul
-          variants={item}
-          className="flex flex-wrap gap-2"
-        >
+        <motion.ul variants={item} className="flex flex-wrap gap-2">
           {entry.stack.map((s) => (
             <li
               key={s}
@@ -272,7 +271,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           variants={item}
           className="font-mono text-xs uppercase tracking-[0.3em] text-ink-mute"
         >
-          Lessons
+          {t(wa.sectionLessons, locale)}
         </motion.h2>
         <ul className="space-y-4">
           {entry.lessons.map((l, i) => (
@@ -284,7 +283,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
                 "border-accent/50",
               )}
             >
-              {l}
+              {t(l, locale)}
             </motion.li>
           ))}
         </ul>
@@ -306,7 +305,7 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
               rel="noopener noreferrer"
               className="rounded-full border border-accent/40 bg-bg-elev px-5 py-2 font-mono text-xs uppercase tracking-widest text-accent transition-colors hover:bg-accent hover:text-bg"
             >
-              {l.label} →
+              {t(l.label, locale)} →
             </a>
           ))}
         </motion.section>
@@ -317,17 +316,12 @@ export function WorkArticle({ entry }: { entry: WorkEntry }) {
           href="/#chapter-3"
           scroll={false}
           onClick={() => {
-            // Same masking logic as the top "Back to portfolio" link, but
-            // this one targets a specific chapter via the hash — the home
-            // page's ScrollRestoration honors window.location.hash when no
-            // saved-scroll is present, scrolling to the named chapter once
-            // layout is stable. The loader covers that window.
             showRouteLoader();
           }}
           className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-mute transition-colors hover:text-accent"
         >
           <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
-          Back to all work
+          {t(wa.backToWork, locale)}
         </Link>
       </footer>
     </article>

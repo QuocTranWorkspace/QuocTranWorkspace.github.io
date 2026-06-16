@@ -4,23 +4,10 @@ import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import Image from "next/image";
 import { useRef } from "react";
 import { Counter } from "@/components/motion/Counter";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings } from "@/content/strings";
+import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-
-const stats = [
-  { to: 10, prefix: "", suffix: "+", label: "YOLO models in prod" },
-  { to: 50, prefix: "", suffix: "+", label: "REST endpoints" },
-  { to: 4, prefix: "", suffix: "", label: "concurrent CCTV feeds" },
-];
-
-const models = [
-  "helmet detection",
-  "oil-spill",
-  "smoke + fire",
-  "license-plate recognition",
-  "face recognition",
-  "people control",
-  "petrolimex uniform",
-];
 
 const headerVariants: Variants = {
   hidden: {},
@@ -39,6 +26,11 @@ const headerItem: Variants = {
 const viewportOpts = { once: true, amount: 0.25 };
 
 export function AIBoxCloseup() {
+  const { locale } = useLocale();
+  const s = strings.aiboxCloseup;
+  const stats = s.stats;
+  const models = s.models;
+
   // scrollYProgress drives the scan-line sweep over the real detection frame.
   const sectionRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll({
@@ -65,23 +57,20 @@ export function AIBoxCloseup() {
             variants={headerItem}
             className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
           >
-            Chapter 04 · AIBox closeup · two production deployments
+            {t(s.eyebrow, locale)}
           </motion.p>
           <motion.h2
             variants={headerItem}
             className="font-display text-5xl md:text-7xl text-balance"
           >
-            Edge AI live at Noi Bai airport and a 110 kV substation.
+            {t(s.headline, locale)}
           </motion.h2>
           <motion.p variants={headerItem} className="text-ink-mute text-lg max-w-2xl">
-            Live at{" "}
-            <span className="text-ink">Petrolimex Aviation at Noi Bai International Airport</span>{" "}
-            and at{" "}
-            <span className="text-ink">EVN&rsquo;s 110 kV Mo Lao substation</span>.
-            One rugged box per site watches four cameras at once, spots safety
-            violations the instant they happen, and pushes alerts to the cloud
-            in under a second. No video ever leaves the site for AI — the
-            inference runs right there on the device.
+            {t(s.subtitleA, locale)}
+            <span className="text-ink">{t(s.subtitleSiteA, locale)}</span>
+            {t(s.subtitleB, locale)}
+            <span className="text-ink">{t(s.subtitleSiteB, locale)}</span>
+            {t(s.subtitleC, locale)}
           </motion.p>
         </motion.header>
 
@@ -95,18 +84,22 @@ export function AIBoxCloseup() {
             className="space-y-10"
           >
             <ul className="grid grid-cols-3 gap-6">
-              {stats.map((s) => (
-                <motion.li key={s.label} variants={headerItem} className="space-y-2">
+              {stats.map((stat) => (
+                <motion.li
+                  key={stat.label.en}
+                  variants={headerItem}
+                  className="space-y-2"
+                >
                   <p className="stat text-4xl md:text-5xl">
                     <Counter
-                      to={s.to}
-                      prefix={s.prefix}
-                      suffix={s.suffix}
+                      to={stat.to}
+                      prefix={stat.prefix}
+                      suffix={stat.suffix}
                       duration={1.4}
                     />
                   </p>
                   <p className="font-mono text-xs uppercase tracking-widest text-ink-mute max-w-[10rem]">
-                    {s.label}
+                    {t(stat.label, locale)}
                   </p>
                 </motion.li>
               ))}
@@ -117,12 +110,12 @@ export function AIBoxCloseup() {
               className="rounded-2xl border rule bg-bg-elev/60 p-6 sm:p-8"
             >
               <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-mute mb-4">
-                Models in the field
+                {t(s.modelsHeader, locale)}
               </p>
               <ul className="flex flex-wrap gap-2">
                 {models.map((m, i) => (
                   <motion.li
-                    key={m}
+                    key={m.en}
                     initial={{ opacity: 0, y: 8 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={viewportOpts}
@@ -133,24 +126,27 @@ export function AIBoxCloseup() {
                     }}
                     className="rounded-full border rule px-3 py-1 font-mono text-xs text-ink"
                   >
-                    {m}
+                    {t(m, locale)}
                   </motion.li>
                 ))}
               </ul>
             </motion.div>
 
             <motion.p variants={headerItem} className="text-ink-mute text-sm max-w-xl">
-              Streaming: <span className="text-ink">WebRTC</span> primary,{" "}
-              <span className="text-ink">RTSP</span> for camera ingest,{" "}
-              <span className="text-ink">MJPEG</span> fallback. WebSocket
-              broadcasts every detection event for the cloud&rsquo;s live timeline.
+              {t(s.streamingA, locale)}
+              <span className="text-ink">WebRTC</span>
+              {t(s.streamingPrimary, locale)}
+              <span className="text-ink">RTSP</span>
+              {t(s.streamingIngest, locale)}
+              <span className="text-ink">MJPEG</span>
+              {t(s.streamingFallback, locale)}
             </motion.p>
           </motion.div>
 
-          {/* Real production frame from Petrolimex Aviation, Noi Bai cam 001.
-              The image already carries the live YOLO bounding boxes -- our
-              overlay is just the CCTV HUD + a scrub-driven scan line. */}
-          <DetectionFrame scrollYProgress={scrollYProgress} />
+          <DetectionFrame
+            scrollYProgress={scrollYProgress}
+            altText={t(s.frameAlt, locale)}
+          />
         </div>
       </div>
     </section>
@@ -159,9 +155,10 @@ export function AIBoxCloseup() {
 
 type DetectionFrameProps = {
   scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
+  altText: string;
 };
 
-function DetectionFrame({ scrollYProgress }: DetectionFrameProps) {
+function DetectionFrame({ scrollYProgress, altText }: DetectionFrameProps) {
   // A horizontal scan line sweeps top-to-bottom as the user scrolls the
   // section. Maps section-progress 0.25..0.85 -> 0%..100% of the frame.
   const scanY = useTransform(scrollYProgress, [0.25, 0.85], ["0%", "100%"]);
@@ -176,7 +173,7 @@ function DetectionFrame({ scrollYProgress }: DetectionFrameProps) {
     >
       <Image
         src="/media/aibox-noibai-001.jpg"
-        alt="Live frame from AIBox at Petrolimex Aviation, Noi Bai: a refueling truck and ground crew with YOLO bounding boxes drawn around helmets, vests, and a flagged PPE-negative person."
+        alt={altText}
         fill
         sizes="(min-width: 1024px) 50vw, 100vw"
         priority={false}
@@ -199,10 +196,11 @@ function DetectionFrame({ scrollYProgress }: DetectionFrameProps) {
         }}
       />
 
-      {/* Scrub-driven scan line */}
+      {/* Scrub-driven scan line. Glow uses --color-accent-glow (rgba parts
+          of the cobalt token) so a future palette swap touches one place. */}
       <motion.div
         aria-hidden
-        className="absolute inset-x-0 h-px bg-accent/80 shadow-[0_0_12px_2px_rgba(108,229,199,0.6)]"
+        className="absolute inset-x-0 h-px bg-accent/80 shadow-[0_0_12px_2px_rgba(var(--color-accent-glow)/0.6)]"
         style={{ top: scanY }}
       />
 

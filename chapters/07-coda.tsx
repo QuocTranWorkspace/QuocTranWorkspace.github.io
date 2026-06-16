@@ -4,25 +4,19 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { Check, Copy } from "lucide-react";
 import { useRef, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings, format } from "@/content/strings";
+import { t, type LocalizedText } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const EMAIL = "quoctranworkspace@gmail.com";
 
 type ExternalLink = {
-  label: string;
+  label: LocalizedText;
   href: string;
   value: string;
   accent?: "default" | "warm";
 };
-
-const externalLinks: ExternalLink[] = [
-  { label: "GitHub", href: "https://github.com/QuocTranWorkspace", value: "@QuocTranWorkspace" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/quoc-tran-trung-070b34268/", value: "quoc-tran-trung" },
-  { label: "mnemo", href: "https://github.com/mmct-jsc/mnemo", value: "mmct-jsc/mnemo" },
-  // Ko-fi gets the warm accent — a polite, non-shouty "support" affordance
-  // that lives next to the social links rather than as a separate plea.
-  { label: "Buy me a coffee", href: "https://ko-fi.com/quoctrantrung", value: "ko-fi.com/quoctrantrung", accent: "warm" },
-];
 
 const container: Variants = {
   hidden: {},
@@ -41,14 +35,42 @@ const item: Variants = {
 const viewportOpts = { once: true, amount: 0.3 };
 
 export function Coda() {
+  const { locale } = useLocale();
+  const s = strings.coda;
   const toast = useToast();
   const [copied, setCopied] = useState(false);
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // GitHub / LinkedIn / mnemo are proper nouns — same in both locales.
+  // Ko-fi gets a localized label so VI sees "Mời tôi cà phê".
+  const externalLinks: ExternalLink[] = [
+    {
+      label: { en: "GitHub", vi: "GitHub" },
+      href: "https://github.com/QuocTranWorkspace",
+      value: "@QuocTranWorkspace",
+    },
+    {
+      label: { en: "LinkedIn", vi: "LinkedIn" },
+      href: "https://www.linkedin.com/in/quoc-tran-trung-070b34268/",
+      value: "quoc-tran-trung",
+    },
+    {
+      label: { en: "mnemo", vi: "mnemo" },
+      href: "https://github.com/mmct-jsc/mnemo",
+      value: "mmct-jsc/mnemo",
+    },
+    {
+      label: s.coffeeLabel,
+      href: "https://ko-fi.com/quoctrantrung",
+      value: "ko-fi.com/quoctrantrung",
+      accent: "warm",
+    },
+  ];
+
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(EMAIL);
-      toast.show("Email copied");
+      toast.show(t(s.emailCopiedToast, locale));
       setCopied(true);
       if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
       copyResetTimer.current = setTimeout(() => setCopied(false), 2200);
@@ -79,22 +101,24 @@ export function Coda() {
               variants={item}
               className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
             >
-              Chapter 07 · Coda
+              {t(s.eyebrow, locale)}
             </motion.p>
             <motion.h2
               variants={item}
               className="font-display leading-[0.92] text-balance text-6xl md:text-8xl xl:text-[9.5rem]"
             >
-              Let&rsquo;s talk.
+              {t(s.headline, locale)}
             </motion.h2>
           </div>
           <motion.p
             variants={item}
             className="text-ink-mute text-lg text-balance lg:pb-4"
           >
-            Open to <span className="text-ink">Full-Stack Engineer</span> and{" "}
-            <span className="text-ink">Technical Lead</span> roles. Hanoi-based,
-            GMT+7, response within one working day.
+            {t(s.subtitleA, locale)}
+            <span className="text-ink">{t(s.subtitleRoleA, locale)}</span>
+            {t(s.subtitleB, locale)}
+            <span className="text-ink">{t(s.subtitleRoleB, locale)}</span>
+            {t(s.subtitleTail, locale)}
           </motion.p>
         </div>
 
@@ -104,22 +128,19 @@ export function Coda() {
             <button
               type="button"
               onClick={copyEmail}
-              aria-label={`Copy email address ${EMAIL} to clipboard`}
+              aria-label={format(t(s.emailCopyAria, locale), { email: EMAIL })}
               className={cn(
                 "group flex w-full flex-col gap-3 rounded-2xl border rule bg-bg-elev/60 px-6 py-6 text-left sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-8",
                 "transition-all hover:border-accent/60 hover:bg-bg-elev focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
               )}
             >
               <span className="shrink-0 font-mono text-xs uppercase tracking-widest text-ink-mute">
-                Email — tap to copy
+                {t(s.emailLabel, locale)}
               </span>
               <span className="flex min-w-0 items-center gap-3">
                 <span className="min-w-0 break-all font-display text-lg text-ink transition-colors group-hover:text-accent sm:text-2xl md:text-3xl">
                   {EMAIL}
                 </span>
-                {/* Swap Copy <-> Check on copy — a tiny rotate+scale crossfade
-                    so the affordance reads as a confirmed state, not just a
-                    silent toast. Resets after 2.2 s. */}
                 <span
                   aria-hidden
                   className="relative inline-flex size-5 shrink-0 items-center justify-center"
@@ -167,7 +188,7 @@ export function Coda() {
             {externalLinks.map((l) => {
               const warm = l.accent === "warm";
               return (
-                <li key={l.label}>
+                <li key={l.href}>
                   <a
                     href={l.href}
                     target="_blank"
@@ -176,7 +197,7 @@ export function Coda() {
                       "group flex h-full flex-col gap-1 rounded-2xl border rule bg-bg-elev/40 px-6 py-5 transition-colors hover:bg-bg-elev",
                       warm
                         ? "hover:border-accent-warm/50"
-                        : "hover:border-accent/40",
+                        : "hover:border-accent/50",
                     )}
                   >
                     <span
@@ -185,7 +206,7 @@ export function Coda() {
                         warm ? "text-accent-warm/90" : "text-ink-mute",
                       )}
                     >
-                      {l.label}
+                      {t(l.label, locale)}
                     </span>
                     <span
                       className={cn(
@@ -206,8 +227,7 @@ export function Coda() {
 
         <motion.footer variants={item} className="border-t rule pt-10">
           <p className="text-center font-mono text-xs text-ink-mute">
-            Built with Next.js · Tailwind v4 · GSAP · Lenis · Framer Motion.
-            Source on GitHub. © {new Date().getFullYear()} Quoc Tran Trung.
+            {format(t(s.footer, locale), { year: new Date().getFullYear() })}
           </p>
         </motion.footer>
       </motion.div>

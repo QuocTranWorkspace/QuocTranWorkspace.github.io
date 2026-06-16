@@ -1,43 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings } from "@/content/strings";
 import { ensureGsap, ScrollTrigger } from "@/lib/gsap";
-
-const milestones = [
-  {
-    year: "2021",
-    title: "Hanoi University",
-    detail:
-      "B.Sc. IT, Software Engineering — English programme. The PHP-on-WAMP era.",
-  },
-  {
-    year: "2022",
-    title: "Devpro J2EE certification",
-    detail:
-      "Java Web Full-Stack, eight months of writing servlets after class.",
-  },
-  {
-    year: "2023",
-    title: "HANU IT Youth Union — Logistics Lead",
-    detail:
-      "Ran logistics for the IT Department Freshmen Welcome and the Warm Spring volunteer campaign.",
-  },
-  {
-    year: "2024",
-    title: "British University Vietnam",
-    detail:
-      "PHP / Laravel internship in the ICT department. Built a barcode-detection pipeline that retired a manual data-entry workflow.",
-  },
-  {
-    year: "2024",
-    title: "HANU Youth Union — Secretary",
-    detail:
-      "Led the executive team across campus-wide events. First time owning a roadmap end-to-end.",
-  },
-];
+import { t } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 export function Origin() {
+  const { locale } = useLocale();
+  const s = strings.origin;
+  const milestones = s.milestones;
+
   const outerRef = useRef<HTMLElement | null>(null);
   const pinRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -129,7 +103,9 @@ export function Origin() {
       clearTimeout(settleTimer);
       ctx.revert();
     };
-  }, []);
+    // Re-run when the locale changes — text length differs and the
+    // pinned-track distance must re-measure off the new card widths.
+  }, [locale, milestones.length]);
 
   return (
     <section
@@ -151,10 +127,10 @@ export function Origin() {
         <div className="container-edge lg:pt-12 xl:pt-20">
           <header className="max-w-3xl space-y-2 mb-6 lg:mb-4 xl:mb-8 lg:space-y-3">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
-              Chapter 01 · Origin
+              {t(s.eyebrow, locale)}
             </p>
             <h2 className="font-display text-balance text-4xl md:text-5xl lg:text-4xl xl:text-6xl 2xl:text-7xl leading-[1.05]">
-              The first three years happened on a single laptop in Hanoi.
+              {t(s.headline, locale)}
             </h2>
           </header>
         </div>
@@ -172,16 +148,6 @@ export function Origin() {
           </span>
         </div>
 
-        {/*
-          The horizontal track.
-          - Below lg: stacked vertically inside a max-width 1280 centered
-            container (mimicking container-edge).
-          - On lg+: the wrapper releases the max-width / padding so the track
-            spans full viewport width. The track itself carries symmetric
-            left + right padding (matching container-edge's clamp), and the
-            distance calc below ends with the last card's right edge offset
-            from viewport right by exactly that right-pad value.
-        */}
         <div
           className={cn(
             "mx-auto w-full max-w-[1280px] px-[clamp(1.25rem,4vw,4rem)]",
@@ -198,7 +164,7 @@ export function Origin() {
           >
             {milestones.map((m, i) => (
               <article
-                key={m.year + m.title}
+                key={m.year + t(m.title, locale)}
                 className={cn(
                   "relative shrink-0 rounded-2xl border rule bg-bg-elev/60 transition-colors",
                   "p-6 xl:p-8",
@@ -211,10 +177,10 @@ export function Origin() {
                   {m.year}
                 </p>
                 <h3 className="mt-3 xl:mt-4 font-display text-2xl xl:text-3xl leading-tight">
-                  {m.title}
+                  {t(m.title, locale)}
                 </h3>
                 <p className="mt-3 xl:mt-4 text-ink-mute text-sm xl:text-base leading-relaxed">
-                  {m.detail}
+                  {t(m.detail, locale)}
                 </p>
                 <span
                   aria-hidden
@@ -228,12 +194,8 @@ export function Origin() {
           </div>
         </div>
 
-        {/* Scroll hint -- absolutely positioned to the bottom-right of the
-            pin so it never competes with the year-rail for vertical space.
-            Below lg the pin isn't pinned at all (lg:h-svh lg:overflow-hidden)
-            so the hint stays hidden on mobile / tablet. */}
         <p className="pointer-events-none absolute bottom-6 right-[clamp(1.25rem,4vw,4rem)] hidden font-mono text-[11px] uppercase tracking-[0.25em] text-ink-mute lg:block">
-          Scroll to advance →
+          {t(s.scrollHint, locale)}
         </p>
       </div>
     </section>

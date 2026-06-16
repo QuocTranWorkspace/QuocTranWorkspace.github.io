@@ -1,19 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings } from "@/content/strings";
+import { t } from "@/lib/i18n";
 import { getLenis } from "@/lib/lenis";
+import { cn } from "@/lib/utils";
 
-const chapters = [
-  { id: "chapter-0", label: "Cold open" },
-  { id: "chapter-1", label: "Origin" },
-  { id: "chapter-2", label: "Crossover" },
-  { id: "chapter-3", label: "Lead arc" },
-  { id: "chapter-4", label: "AIBox" },
-  { id: "chapter-5", label: "mnemo" },
-  { id: "chapter-6", label: "Constellation" },
-  { id: "chapter-7", label: "Coda" },
-];
+// Chapter IDs are stable across locales — the labels swap, the structure
+// doesn't. Order matters: matches the visual order on the page.
+const CHAPTER_IDS = [
+  "chapter-0",
+  "chapter-1",
+  "chapter-2",
+  "chapter-3",
+  "chapter-4",
+  "chapter-5",
+  "chapter-6",
+  "chapter-7",
+] as const;
 
 // Compute the active chapter directly from a scrollY — used as both the
 // initial seed (correct even after ScrollRestoration snaps the page) and a
@@ -23,46 +28,38 @@ function activeIndexFromScrollY(y: number): number {
   // line (35 % from the top of the viewport). Mirrors the IO threshold.
   const line = y + window.innerHeight * 0.35;
   let idx = 0;
-  for (let i = 0; i < chapters.length; i++) {
-    const el = document.getElementById(chapters[i]!.id);
+  for (let i = 0; i < CHAPTER_IDS.length; i++) {
+    const el = document.getElementById(CHAPTER_IDS[i]!);
     if (el && el.offsetTop <= line) idx = i;
   }
   return idx;
 }
 
 export function SideDots() {
+  const { locale } = useLocale();
+  const sd = strings.sideDots;
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const sections = chapters
-      .map((c) => document.getElementById(c.id))
+    const sections = CHAPTER_IDS
+      .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
 
     if (sections.length === 0) return;
 
-    // 1. Seed initial state from current scroll position. On return from a
-    //    /work deep dive, ScrollRestoration snaps the page to chapter 3
-    //    *before* the IntersectionObserver fires its initial callback —
-    //    relying on IO alone leaves the active dot stuck at chapter 0.
     setActive(activeIndexFromScrollY(window.scrollY));
 
-    // 2. Listen to Lenis scroll events. Lenis is the source of truth while
-    //    smooth-scroll is active; native `scroll` events fire too, but
-    //    Lenis emits before/with them and is reliable on the snap.
     const recompute = () =>
       setActive(activeIndexFromScrollY(window.scrollY));
     const lenis = getLenis();
     lenis?.on("scroll", recompute);
     window.addEventListener("scroll", recompute, { passive: true });
 
-    // 3. IntersectionObserver still catches in-page transitions cleanly for
-    //    chapters taller than the viewport where pure scrollY-vs-offsetTop
-    //    flips can stutter. Belt + braces.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          const idx = chapters.findIndex((c) => c.id === entry.target.id);
+          const idx = CHAPTER_IDS.findIndex((id) => id === entry.target.id);
           if (idx >= 0) setActive(idx);
         });
       },
@@ -90,25 +87,22 @@ export function SideDots() {
 
   return (
     <nav
-      aria-label="Chapter navigation"
+      aria-label={t(sd.aria, locale)}
       // lg:block (1024+) instead of md:block (768+) so we never collide with
       // container-edge content at 175% zoom or narrow widescreens.
       className="fixed right-4 top-1/2 z-30 -translate-y-1/2 hidden lg:block xl:right-6"
     >
       <ul className="flex flex-col gap-3.5">
-        {chapters.map((c, i) => {
+        {CHAPTER_IDS.map((id, i) => {
           const isActive = i === active;
+          const label = t(sd.chapters[id], locale);
           return (
-            <li key={c.id} className="relative flex justify-end">
+            <li key={id} className="relative flex justify-end">
               <button
                 type="button"
-                onClick={() => jumpTo(c.id)}
-                aria-label={`Jump to ${c.label}`}
+                onClick={() => jumpTo(id)}
+                aria-label={`${t(sd.jumpTo, locale)} ${label}`}
                 aria-current={isActive ? "true" : undefined}
-                // Hit area is generous (size-6 = 24x24px) but the visible
-                // dot is small. Label tooltip appears to the LEFT only on
-                // hover/focus, never persistently — so the nav has zero
-                // horizontal footprint at rest and won't overlap content.
                 className={cn(
                   "group relative flex size-6 items-center justify-center cursor-pointer",
                   "focus-visible:outline-none rounded-full",
@@ -118,7 +112,7 @@ export function SideDots() {
                   className={cn(
                     "size-2 rounded-full border transition-all duration-300",
                     isActive
-                      ? "bg-accent border-accent scale-125"
+                      ? "bg-accent border-accent scale-125 shadow-[0_0_10px_2px_rgba(var(--color-accent-glow)/0.55)]"
                       : "border-ink-mute/50 bg-transparent group-hover:border-ink group-focus-visible:border-ink",
                   )}
                 />
@@ -132,7 +126,7 @@ export function SideDots() {
                     "group-focus-visible:opacity-100 group-focus-visible:translate-x-0",
                   )}
                 >
-                  {c.label}
+                  {label}
                 </span>
               </button>
             </li>

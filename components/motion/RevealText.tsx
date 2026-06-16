@@ -88,7 +88,13 @@ export function RevealText({
               >
                 <motion.span
                   variants={wordVariants}
-                  className={cn("inline-block", tok.italic && "italic")}
+                  // Italic tokens carry the cobalt accent — the visual
+                  // "shipping" tag in headlines like "I ship *production*
+                  // systems" without resorting to color in plain copy.
+                  className={cn(
+                    "inline-block",
+                    tok.italic && "italic text-accent",
+                  )}
                 >
                   {tok.text}
                 </motion.span>

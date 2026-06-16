@@ -2,8 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+import { LocaleProvider } from "@/components/providers/LocaleProvider";
 import { RouteLoader } from "@/components/providers/RouteLoader";
 import { SideDots } from "@/components/nav/SideDots";
+import { LangToggle } from "@/components/ui/LangToggle";
 import { ToastProvider } from "@/components/ui/Toast";
 import "@/styles/globals.css";
 
@@ -94,19 +96,22 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <SmoothScrollProvider>
-          <ToastProvider>
-            {children}
-            <SideDots />
-            {/* RouteLoader is the LAST child of the layout tree so it paints
-                above everything else. It persists across route changes — the
-                layout doesn't unmount on navigation, only the page subtree
-                does — so a loader started by a Link's onClick survives the
-                tree swap and stays visible until the destination signals
-                ready via hideRouteLoader(). */}
-            <RouteLoader />
-          </ToastProvider>
-        </SmoothScrollProvider>
+        <LocaleProvider>
+          <SmoothScrollProvider>
+            <ToastProvider>
+              {children}
+              <SideDots />
+              <LangToggle />
+              {/* RouteLoader is the LAST child of the layout tree so it paints
+                  above everything else. It persists across route changes — the
+                  layout doesn't unmount on navigation, only the page subtree
+                  does — so a loader started by a Link's onClick survives the
+                  tree swap and stays visible until the destination signals
+                  ready via hideRouteLoader(). */}
+              <RouteLoader />
+            </ToastProvider>
+          </SmoothScrollProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

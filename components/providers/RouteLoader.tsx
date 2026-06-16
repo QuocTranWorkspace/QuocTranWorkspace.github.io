@@ -1,8 +1,9 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { subscribeRouteLoader } from "@/lib/route-loader";
+import { cn } from "@/lib/utils";
 
 /**
  * Full-screen fade overlay that masks the navigation flick.
@@ -20,10 +21,21 @@ import { subscribeRouteLoader } from "@/lib/route-loader";
  *   a glitch, not as an intentional transition. 450 ms feels deliberate
  *   without being slow.
  *
- * Why it's outside <ToastProvider>:
- *   The loader needs to live at the layout root so it persists across
- *   route changes. React unmounts the page subtree on nav; if the loader
- *   lived in a chapter or page component it would unmount mid-transition.
+ * Why always-mounted (no AnimatePresence):
+ *   We previously wrapped the motion.div in AnimatePresence and ternary-
+ *   rendered on `visible`. In React 19 + Next 16 dev (with Strict Mode
+ *   double-invoke + HMR refresh), AnimatePresence intermittently failed
+ *   to unmount the exit-animated wrapper. A full-screen `inset-0` div at
+ *   opacity 0 then silently captured every click on the page underneath.
+ *   The fix: always render the wrapper, drive opacity via animate, and
+ *   toggle pointer-events from CSS based on visible — no AnimatePresence
+ *   means no orphaned-after-exit elements.
+ *
+ * Why it lives at the layout root:
+ *   The loader needs to survive the page-subtree swap during navigation.
+ *   React unmounts page components on route change; the layout itself
+ *   does not. If the loader lived in a chapter or page it would unmount
+ *   mid-transition and the flick would re-appear.
  */
 const MIN_HOLD_MS = 450;
 
@@ -57,40 +69,41 @@ export function RouteLoader() {
   }, []);
 
   return (
-    <AnimatePresence>
-      {visible ? (
-        <motion.div
-          key="route-loader"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          aria-hidden
-          // z-index above SideDots (z-40) and any chapter content. bg-bg
-          // matches the page background so the fade reads as "the page is
-          // catching its breath" rather than "a black overlay just appeared".
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-bg"
-        >
-          {/* Three softly-pulsing dots — echoes the SideDots aesthetic
-              so the loader feels like part of the same UI vocabulary. */}
-          <div className="flex items-center gap-2">
-            {[0, 1, 2].map((i) => (
-              <motion.span
-                key={i}
-                aria-hidden
-                animate={{ opacity: [0.25, 1, 0.25] }}
-                transition={{
-                  duration: 1.1,
-                  ease: "easeInOut",
-                  repeat: Infinity,
-                  delay: i * 0.18,
-                }}
-                className="block size-2 rounded-full bg-accent"
-              />
-            ))}
-          </div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+    <motion.div
+      aria-hidden
+      // z-index above SideDots (z-30) and LangToggle (z-30) but below any
+      // hypothetical native browser overlay. Background matches the page
+      // so the fade reads as "the page is catching its breath" rather
+      // than "a black overlay just appeared".
+      animate={{ opacity: visible ? 1 : 0 }}
+      initial={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      className={cn(
+        "fixed inset-0 z-[120] flex items-center justify-center bg-bg",
+        // Critical: pointer-events follows visible, NOT the opacity. A
+        // wrapper at opacity 0 still captures clicks if pointer-events
+        // is auto — exactly the bug this rewrite fixes.
+        visible ? "pointer-events-auto" : "pointer-events-none",
+      )}
+    >
+      {/* Three softly-pulsing dots — echoes the SideDots aesthetic
+          so the loader feels like part of the same UI vocabulary. */}
+      <div className="flex items-center gap-2">
+        {[0, 1, 2].map((i) => (
+          <motion.span
+            key={i}
+            aria-hidden
+            animate={{ opacity: [0.25, 1, 0.25] }}
+            transition={{
+              duration: 1.1,
+              ease: "easeInOut",
+              repeat: Infinity,
+              delay: i * 0.18,
+            }}
+            className="block size-2 rounded-full bg-accent"
+          />
+        ))}
+      </div>
+    </motion.div>
   );
 }

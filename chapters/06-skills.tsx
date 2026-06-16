@@ -2,28 +2,33 @@
 
 import { motion, type Variants } from "framer-motion";
 import { useState } from "react";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { strings } from "@/content/strings";
+import { t, type LocalizedText } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type SkillGroup = {
-  label: string;
+  /** English key — looks up the localized label + provides a stable id. */
+  key: keyof typeof strings.skills.groupLabels;
+  /** Tech labels stay in English in both locales. */
   items: string[];
 };
 
 const skillGroups: SkillGroup[] = [
   {
-    label: "Languages",
+    key: "Languages",
     items: ["Python", "Go 1.25", "TypeScript", "Java", "PHP", "C#"],
   },
   {
-    label: "Backend",
+    key: "Backend",
     items: ["FastAPI", "NestJS", "Spring Boot", "Laravel", "Express"],
   },
   {
-    label: "Frontend",
+    key: "Frontend",
     items: ["React", "React Native", "Vue 3", "Tailwind"],
   },
   {
-    label: "AI / ML",
+    key: "AI / ML",
     items: [
       "YOLO v8/v11",
       "FaceNet / MTCNN",
@@ -34,7 +39,7 @@ const skillGroups: SkillGroup[] = [
     ],
   },
   {
-    label: "Data",
+    key: "Data",
     items: [
       "PostgreSQL",
       "MySQL",
@@ -46,7 +51,7 @@ const skillGroups: SkillGroup[] = [
     ],
   },
   {
-    label: "Infra",
+    key: "Infra",
     items: [
       "Docker",
       "Kubernetes (GKE)",
@@ -57,11 +62,11 @@ const skillGroups: SkillGroup[] = [
     ],
   },
   {
-    label: "Edge / IoT",
+    key: "Edge / IoT",
     items: ["NVIDIA Jetson (CUDA 12.8)", "RTSP", "WebRTC", "WebSocket"],
   },
   {
-    label: "Architecture",
+    key: "Architecture",
     items: [
       "Clean Architecture",
       "DDD",
@@ -73,20 +78,17 @@ const skillGroups: SkillGroup[] = [
   },
 ];
 
-// Hand-picked cross-group edges — pairs of group indices that often co-occur in
-// the projects on this site (AIBox, mnemo, Swisslife, Keanu, etc.). Drawn as
-// soft curves behind the cards so the surface feels like a graph, not a grid.
 const EDGES: Array<[number, number]> = [
-  [0, 1], // Languages -> Backend
-  [1, 4], // Backend -> Data
-  [4, 5], // Data -> Infra
-  [5, 6], // Infra -> Edge / IoT
-  [3, 4], // AI / ML -> Data (pgvector / sqlite-vec)
-  [3, 6], // AI / ML -> Edge / IoT (Jetson)
-  [1, 7], // Backend -> Architecture
-  [2, 1], // Frontend -> Backend
-  [7, 5], // Architecture -> Infra
-  [0, 3], // Languages -> AI / ML
+  [0, 1],
+  [1, 4],
+  [4, 5],
+  [5, 6],
+  [3, 4],
+  [3, 6],
+  [1, 7],
+  [2, 1],
+  [7, 5],
+  [0, 3],
 ];
 
 const containerVariants: Variants = {
@@ -105,8 +107,6 @@ const cardVariants: Variants = {
 
 const viewportOpts = { once: true, amount: 0.2 };
 
-// Position each group on a unit grid (4 cols × 2 rows). x in [0,3], y in [0,1].
-// Converted to viewBox coords later.
 const POS: Array<{ x: number; y: number }> = [
   { x: 0, y: 0 },
   { x: 1, y: 0 },
@@ -122,7 +122,6 @@ const VIEW_W = 400;
 const VIEW_H = 200;
 
 function gridToView(g: { x: number; y: number }) {
-  // Center of each cell in the 4×2 grid.
   return {
     cx: (g.x + 0.5) * (VIEW_W / 4),
     cy: (g.y + 0.5) * (VIEW_H / 2),
@@ -130,6 +129,8 @@ function gridToView(g: { x: number; y: number }) {
 }
 
 export function Skills() {
+  const { locale } = useLocale();
+  const s = strings.skills;
   const [activeGroup, setActiveGroup] = useState<number | null>(null);
 
   const isEdgeActive = (a: number, b: number) =>
@@ -152,34 +153,24 @@ export function Skills() {
           variants={cardVariants}
           className="font-mono text-xs uppercase tracking-[0.3em] text-accent"
         >
-          Chapter 06 · Constellation
+          {t(s.eyebrow, locale)}
         </motion.p>
         <motion.h2
           variants={cardVariants}
           className="font-display text-5xl md:text-7xl text-balance"
         >
-          Tools I reach for, grouped by where they live in the stack.
+          {t(s.headline, locale)}
         </motion.h2>
         <motion.p
           variants={cardVariants}
           className="text-ink-mute text-sm max-w-xl"
         >
-          <span className="lg:hidden">
-            Eight clusters, one stack. Languages feed Backends, Backends sit on
-            Data, Data sits on Infra; AI/ML borrows from each.
-          </span>
-          <span className="hidden lg:inline">
-            Hover a cluster to see the edges that link it to the rest of the
-            stack — these are the typical seams the projects on this site cross.
-          </span>
+          <span className="lg:hidden">{t(s.subtitleMobile, locale)}</span>
+          <span className="hidden lg:inline">{t(s.subtitleDesktop, locale)}</span>
         </motion.p>
       </motion.header>
 
       <div className="relative">
-        {/* SVG connector layer — drawn behind the cards so edges visibly bridge
-            adjacent clusters. preserveAspectRatio:'none' so the curves stretch
-            with the card grid. Hidden below lg where the grid collapses out
-            of the 4x2 layout the edge coordinates were designed against. */}
         <svg
           aria-hidden
           className="pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
@@ -188,8 +179,11 @@ export function Skills() {
         >
           <defs>
             <linearGradient id="edge-gradient" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%" stopColor="#6CE5C7" stopOpacity="0.15" />
-              <stop offset="100%" stopColor="#6CE5C7" stopOpacity="0.4" />
+              {/* Cobalt #4F7EFF — kept inline because SVG gradients can't
+                  reference CSS var() reliably across browsers in static
+                  export. If the brand color shifts again, update here too. */}
+              <stop offset="0%" stopColor="#4F7EFF" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="#4F7EFF" stopOpacity="0.45" />
             </linearGradient>
           </defs>
           {EDGES.map(([a, b], i) => {
@@ -198,9 +192,6 @@ export function Skills() {
             if (!pa || !pb) return null;
             const A = gridToView(pa);
             const B = gridToView(pb);
-            // Quadratic curve with a midpoint nudged perpendicular to AB so
-            // the line bows away from the straight chord (more "constellation"
-            // less "geometric grid").
             const mx = (A.cx + B.cx) / 2;
             const my = (A.cy + B.cy) / 2;
             const dx = B.cx - A.cx;
@@ -251,16 +242,18 @@ export function Skills() {
           {skillGroups.map((g, i) => {
             const isActive = activeGroup === i;
             const isDimmed = activeGroup !== null && !isActive;
+            const labelLocalized: LocalizedText = s.groupLabels[g.key];
+            const label = t(labelLocalized, locale);
             return (
               <motion.section
-                key={g.label}
+                key={g.key}
                 variants={cardVariants}
                 onMouseEnter={() => setActiveGroup(i)}
                 onMouseLeave={() => setActiveGroup(null)}
                 onFocus={() => setActiveGroup(i)}
                 onBlur={() => setActiveGroup(null)}
                 tabIndex={0}
-                aria-label={`${g.label} skills cluster`}
+                aria-label={`${label} ${t(s.clusterAriaLabel, locale)}`}
                 className={cn(
                   "group relative rounded-2xl border rule bg-bg-elev/70 p-6 backdrop-blur-sm transition-all duration-500",
                   "focus-visible:outline-none focus-visible:border-accent/60",
@@ -268,7 +261,6 @@ export function Skills() {
                   isDimmed && "opacity-45",
                 )}
               >
-                {/* Cluster index node — visually anchors the SVG edges */}
                 <span
                   aria-hidden
                   className={cn(
@@ -281,7 +273,7 @@ export function Skills() {
                 </span>
 
                 <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-ink-mute mb-4 mt-2">
-                  {g.label}
+                  {label}
                 </h3>
                 <ul className="space-y-1.5">
                   {g.items.map((it) => (
@@ -303,13 +295,8 @@ export function Skills() {
       </div>
 
       <p className="mt-10 max-w-2xl text-ink-mute text-sm">
-        <span className="hidden lg:inline">
-          Each thin curve marks a seam between clusters that show up together
-          in the projects above — Languages ↔ Backend, AI/ML ↔ Edge,
-          Backend ↔ Data, and so on.{" "}
-        </span>
-        These are the typical seams the projects on this site cross. Reduced-motion
-        users see the same layout without the draw-in.
+        <span className="hidden lg:inline">{t(s.footerDesktop, locale)}</span>
+        {t(s.footer, locale)}
       </p>
     </section>
   );
