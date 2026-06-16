@@ -103,9 +103,17 @@ export function Origin() {
       clearTimeout(settleTimer);
       ctx.revert();
     };
-    // Re-run when the locale changes — text length differs and the
-    // pinned-track distance must re-measure off the new card widths.
-  }, [locale, milestones.length]);
+    // Set up once on mount and tear down on unmount only. Re-running on
+    // locale change calls ctx.revert(), which strips the ScrollTrigger pin
+    // spacer — that shrinks documentElement.scrollHeight by ~one viewport
+    // height. The user's numeric scrollY stays the same, so they end up
+    // visually parked deeper than they were (chapter 3 instead of 1).
+    // Card widths are fixed via Tailwind classes (lg:w-[20rem] xl:w-[24rem]
+    // 2xl:w-[26rem]) so translated text doesn't change the track distance
+    // and we don't need to re-measure. ScrollTrigger.refresh() fires from
+    // window.resize if the layout *does* shift for any other reason.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section

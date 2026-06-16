@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useLocale } from "@/components/providers/LocaleProvider";
 import { LOCALES, type Locale } from "@/lib/i18n";
+import { hideRouteLoader, showRouteLoader } from "@/lib/route-loader";
 import { cn } from "@/lib/utils";
 
 const LABELS: Record<Locale, string> = {
@@ -54,7 +55,23 @@ export function LangToggle() {
             <button
               key={value}
               type="button"
-              onClick={() => setLocale(value)}
+              onClick={() => {
+                if (value === locale) return;
+                // Mask the locale-change reflow with the route-loader
+                // overlay. Switching languages re-renders every chapter
+                // component with new strings — without a mask the user
+                // sees the layout briefly de-cohere.
+                //
+                // Order: show, swap synchronously, then schedule hide for
+                // after React has committed. setTimeout(0) yields to the
+                // microtask queue so the state update commits + paints
+                // before we signal hide; the loader's MIN_HOLD_MS keeps
+                // the overlay perceptible regardless of how fast the
+                // commit finishes.
+                showRouteLoader();
+                setLocale(value);
+                setTimeout(() => hideRouteLoader(), 0);
+              }}
               aria-label={ARIA[value]}
               aria-pressed={isActive}
               className={cn(
