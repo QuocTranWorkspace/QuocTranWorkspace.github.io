@@ -4,7 +4,16 @@ import { motion } from "framer-motion";
 import { useLocale } from "@/components/providers/LocaleProvider";
 import { LOCALES, type Locale } from "@/lib/i18n";
 import { hideRouteLoader, showRouteLoader } from "@/lib/route-loader";
+import { applyScrollAnchor, readScrollAnchor } from "@/lib/scroll-memory";
 import { cn } from "@/lib/utils";
+
+// Re-anchor for at most this many frames before giving up. At 60fps that's
+// ~0.65s — comfortably longer than any locale reflow, and the loader's
+// minimum hold masks the whole window anyway.
+const MAX_SETTLE_FRAMES = 40;
+// Document height must hold steady this many consecutive frames before we
+// trust the reflow is done and reveal.
+const STABLE_FRAMES = 4;
 
 const LABELS: Record<Locale, string> = {
   en: "EN",
@@ -57,20 +66,47 @@ export function LangToggle() {
               type="button"
               onClick={() => {
                 if (value === locale) return;
-                // Mask the locale-change reflow with the route-loader
-                // overlay. Switching languages re-renders every chapter
-                // component with new strings — without a mask the user
-                // sees the layout briefly de-cohere.
+
+                // VI and EN copy differ in length, so every chapter's
+                // height changes on swap. Chapters ABOVE the user's current
+                // position shift the rest of the page down/up, so the
+                // user's absolute scrollY no longer points at the content
+                // they were reading — the page appears to jump (and drifts
+                // further on each toggle).
                 //
-                // Order: show, swap synchronously, then schedule hide for
-                // after React has committed. setTimeout(0) yields to the
-                // microtask queue so the state update commits + paints
-                // before we signal hide; the loader's MIN_HOLD_MS keeps
-                // the overlay perceptible regardless of how fast the
-                // commit finishes.
+                // Fix: snapshot {chapter, offset-within-chapter} BEFORE the
+                // swap, then re-apply it every frame until the document
+                // height stops changing. Re-reading the chapter's live
+                // offsetTop each frame makes this robust to the reflow.
+                // The whole settle runs behind the route loader so none of
+                // the re-anchoring is visible.
+                const anchor = readScrollAnchor();
                 showRouteLoader();
                 setLocale(value);
-                setTimeout(() => hideRouteLoader(), 0);
+
+                let frames = 0;
+                let lastHeight = -1;
+                let stable = 0;
+                const settle = () => {
+                  if (anchor) applyScrollAnchor(anchor);
+                  const h = document.documentElement.scrollHeight;
+                  if (h === lastHeight) stable += 1;
+                  else {
+                    stable = 0;
+                    lastHeight = h;
+                  }
+                  frames += 1;
+                  if (stable >= STABLE_FRAMES || frames >= MAX_SETTLE_FRAMES) {
+                    // One final apply once the layout is provably stable,
+                    // then reveal — the loader's MIN_HOLD keeps it on screen
+                    // long enough that this never flashes.
+                    if (anchor) applyScrollAnchor(anchor);
+                    hideRouteLoader();
+                    return;
+                  }
+                  requestAnimationFrame(settle);
+                };
+                requestAnimationFrame(settle);
               }}
               aria-label={ARIA[value]}
               aria-pressed={isActive}
