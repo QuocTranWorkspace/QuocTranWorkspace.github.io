@@ -128,6 +128,7 @@ export function Coda() {
             <button
               type="button"
               onClick={copyEmail}
+              data-cursor="copy"
               aria-label={format(t(s.emailCopyAria, locale), { email: EMAIL })}
               className={cn(
                 "group flex w-full flex-col gap-3 rounded-2xl border rule bg-bg-elev/60 px-6 py-6 text-left sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-8",

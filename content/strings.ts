@@ -713,6 +713,22 @@ export const strings = {
     } satisfies LocalizedText,
   },
 
+  // ---------- Custom cursor contextual labels ----------
+  cursor: {
+    view: {
+      en: "View",
+      vi: "Xem",
+    } satisfies LocalizedText,
+    copy: {
+      en: "Copy",
+      vi: "Chép",
+    } satisfies LocalizedText,
+    open: {
+      en: "Open",
+      vi: "Mở",
+    } satisfies LocalizedText,
+  },
+
   // ---------- /work [slug] 404 ----------
   notFound: {
     eyebrow: {

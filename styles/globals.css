@@ -117,6 +117,28 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* Custom cursor — hide the native pointer ONLY on real-mouse devices when
+     <CursorFx> is mounted (it adds .cursor-fx-active to <body>). Inputs keep
+     a text caret so the mnemo query box and any field stay usable. The whole
+     block is inside the fine-pointer query, so touch users are never affected
+     and never lose their cursor. */
+  @media (hover: hover) and (pointer: fine) {
+    body.cursor-fx-active,
+    body.cursor-fx-active a,
+    body.cursor-fx-active button,
+    body.cursor-fx-active [role="button"],
+    body.cursor-fx-active label,
+    body.cursor-fx-active summary {
+      cursor: none;
+    }
+    body.cursor-fx-active input,
+    body.cursor-fx-active textarea,
+    body.cursor-fx-active select,
+    body.cursor-fx-active [contenteditable="true"] {
+      cursor: auto;
+    }
+  }
 }
 
 /* Utility layer — small, recurring patterns the design system uses */

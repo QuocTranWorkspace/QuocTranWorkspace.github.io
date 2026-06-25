@@ -5,6 +5,7 @@ import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvide
 import { LocaleProvider } from "@/components/providers/LocaleProvider";
 import { RouteLoader } from "@/components/providers/RouteLoader";
 import { SideDots } from "@/components/nav/SideDots";
+import { CursorFx } from "@/components/ui/CursorFx";
 import { LangToggle } from "@/components/ui/LangToggle";
 import { ToastProvider } from "@/components/ui/Toast";
 import "@/styles/globals.css";
@@ -102,6 +103,7 @@ export default function RootLayout({
               {children}
               <SideDots />
               <LangToggle />
+              <CursorFx />
               {/* RouteLoader is the LAST child of the layout tree so it paints
                   above everything else. It persists across route changes — the
                   layout doesn't unmount on navigation, only the page subtree

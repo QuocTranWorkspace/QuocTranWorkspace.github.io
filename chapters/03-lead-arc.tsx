@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { useLocale } from "@/components/providers/LocaleProvider";
 import { strings, format } from "@/content/strings";
-import { workSlugs } from "@/content/work";
+import { works, workSlugs } from "@/content/work";
 import { t, type LocalizedText } from "@/lib/i18n";
 import { showRouteLoader } from "@/lib/route-loader";
 import { rememberHomeScroll } from "@/lib/scroll-memory";
@@ -146,6 +146,11 @@ export function LeadArc() {
       >
         {tileMeta.map((tile) => {
           const hasDeepDive = workSlugs.includes(tile.slug);
+          // First live screenshot for this project, if any — fed to the
+          // custom cursor's floating hover preview (CursorFx reads
+          // data-preview-src). Tiles without a gallery (swisslife, ham-cap)
+          // simply show the "View" label with no image.
+          const previewSrc = works[tile.slug]?.images?.[0]?.src;
           const inner = (
             <>
               <span
@@ -192,6 +197,8 @@ export function LeadArc() {
                     rememberHomeScroll();
                     showRouteLoader();
                   }}
+                  data-cursor="view"
+                  data-preview-src={previewSrc}
                   aria-label={format(t(wa.deepDiveAria, locale), { name: tile.name })}
                   className="flex h-full flex-col justify-between p-6 focus-visible:outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-accent/60"
                 >
